@@ -35,7 +35,6 @@ Guess _guess(String gameId, Prediction prediction) => Guess(
       userId: 'uid-test',
       gameId: gameId,
       prediction: prediction,
-      submittedAt: DateTime.utc(2026, 6, 10, 9, 0),
     );
 
 ScoreSummary _calc(List<Game> games, List<Guess> guesses) => calculate(
@@ -247,7 +246,6 @@ void main() {
         userId: 'uid-other',
         gameId: 'g1',
         prediction: Prediction.teamAWins,
-        submittedAt: DateTime.utc(2026, 6, 10),
       );
 
       final summary = calculate(
