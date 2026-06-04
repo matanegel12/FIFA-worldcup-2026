@@ -13,6 +13,6 @@ abstract class GuessesRepository {
   Future<List<Guess>> fetchGuessesForGame(String gameId);
 
   /// Saves a guess. If the user already guessed this game, the record is
-  /// overwritten — including submittedAt, which always reflects the latest save.
+  /// overwritten with the new prediction.
   Future<void> saveGuess(Guess guess);
 }

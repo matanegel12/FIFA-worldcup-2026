@@ -81,7 +81,6 @@ void main() {
         userId: 'uid-1',
         gameId: 'g1',
         prediction: Prediction.teamAWins,
-        submittedAt: DateTime.utc(2026, 6, 10, 9, 0),
       );
       MockStore.instance.saveGuess(guess);
 
@@ -94,14 +93,11 @@ void main() {
         userId: 'uid-1',
         gameId: 'g1',
         prediction: Prediction.teamAWins,
-        submittedAt: DateTime.utc(2026, 6, 10, 9, 0),
       );
-      // New Guess with updated prediction and fresh submittedAt — no copyWith.
       final updated = Guess(
         userId: 'uid-1',
         gameId: 'g1',
         prediction: Prediction.draw,
-        submittedAt: DateTime.utc(2026, 6, 10, 15, 0),
       );
 
       MockStore.instance.saveGuess(original);
@@ -112,8 +108,8 @@ void main() {
     });
 
     test('guessesForUser returns only that user\'s guesses', () {
-      MockStore.instance.saveGuess(Guess(userId: 'uid-1', gameId: 'g1', prediction: Prediction.draw, submittedAt: DateTime.utc(2026, 6, 10)));
-      MockStore.instance.saveGuess(Guess(userId: 'uid-2', gameId: 'g1', prediction: Prediction.teamBWins, submittedAt: DateTime.utc(2026, 6, 10)));
+      MockStore.instance.saveGuess(const Guess(userId: 'uid-1', gameId: 'g1', prediction: Prediction.draw));
+      MockStore.instance.saveGuess(const Guess(userId: 'uid-2', gameId: 'g1', prediction: Prediction.teamBWins));
 
       expect(MockStore.instance.guessesForUser('uid-1').length, 1);
       expect(MockStore.instance.guessesForUser('uid-2').length, 1);
@@ -148,7 +144,6 @@ void main() {
         userId: 'uid-1',
         gameId: 'g1',
         prediction: Prediction.teamAWins,
-        submittedAt: DateTime.utc(2026, 6, 10),
       ));
       MockStore.instance.setGameResult(
         gameId: 'g1',

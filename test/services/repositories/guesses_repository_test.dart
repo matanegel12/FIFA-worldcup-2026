@@ -6,26 +6,9 @@ import 'package:fifa_worldcup_2026_predictions/services/repositories/guesses_rep
 void main() {
   late MockGuessesRepository repo;
 
-  final t = DateTime.utc(2026, 6, 10, 9, 0);
-
-  final guessUser1Game1 = Guess(
-    userId: 'uid-1',
-    gameId: 'g1',
-    prediction: Prediction.teamAWins,
-    submittedAt: t,
-  );
-  final guessUser1Game2 = Guess(
-    userId: 'uid-1',
-    gameId: 'g2',
-    prediction: Prediction.draw,
-    submittedAt: t,
-  );
-  final guessUser2Game1 = Guess(
-    userId: 'uid-2',
-    gameId: 'g1',
-    prediction: Prediction.teamBWins,
-    submittedAt: t,
-  );
+  const guessUser1Game1 = Guess(userId: 'uid-1', gameId: 'g1', prediction: Prediction.teamAWins);
+  const guessUser1Game2 = Guess(userId: 'uid-1', gameId: 'g2', prediction: Prediction.draw);
+  const guessUser2Game1 = Guess(userId: 'uid-2', gameId: 'g1', prediction: Prediction.teamBWins);
 
   setUp(() {
     MockStore.instance.resetAll();
@@ -86,33 +69,22 @@ void main() {
       expect(result!.prediction, Prediction.teamAWins);
     });
 
-    test('overwriting a guess updates prediction AND submittedAt', () async {
-      await repo.saveGuess(guessUser1Game1); // saved at 09:00
+    test('overwriting a guess updates the prediction', () async {
+      await repo.saveGuess(guessUser1Game1);
 
-      final updated = Guess(
-        userId: 'uid-1',
-        gameId: 'g1',
-        prediction: Prediction.draw,
-        submittedAt: DateTime.utc(2026, 6, 10, 15, 0), // changed at 15:00
-      );
+      const updated = Guess(userId: 'uid-1', gameId: 'g1', prediction: Prediction.draw);
       await repo.saveGuess(updated);
 
       final result = await repo.fetchGuess('uid-1', 'g1');
       expect(result!.prediction, Prediction.draw);
-      expect(result.submittedAt, DateTime.utc(2026, 6, 10, 15, 0));
     });
 
     test('only one guess exists per user per game after multiple saves', () async {
       await repo.saveGuess(guessUser1Game1);
-      await repo.saveGuess(Guess(
-        userId: 'uid-1',
-        gameId: 'g1',
-        prediction: Prediction.teamBWins,
-        submittedAt: DateTime.utc(2026, 6, 10, 12, 0),
-      ));
+      await repo.saveGuess(const Guess(userId: 'uid-1', gameId: 'g1', prediction: Prediction.teamBWins));
 
       final all = await repo.fetchGuessesForGame('g1');
-      expect(all.length, 1); // no duplicates
+      expect(all.length, 1);
     });
   });
 }
