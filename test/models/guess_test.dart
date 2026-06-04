@@ -2,13 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fifa_worldcup_2026_predictions/models/guess.dart';
 
 void main() {
-  final createdAt = DateTime.utc(2026, 6, 10, 9, 0);
+  final submittedAt = DateTime.utc(2026, 6, 10, 9, 0);
 
   final guess = Guess(
     userId: 'uid-abc',
     gameId: 'g1',
     prediction: Prediction.teamAWins,
-    createdAt: createdAt,
+    submittedAt: submittedAt,
   );
 
   group('Guess.fromJson', () {
@@ -17,38 +17,38 @@ void main() {
         'userId': 'uid-abc',
         'gameId': 'g1',
         'prediction': 'teamAWins',
-        'createdAt': '2026-06-10T09:00:00.000Z',
+        'submittedAt': '2026-06-10T09:00:00.000Z',
       });
 
       expect(result.userId, 'uid-abc');
       expect(result.gameId, 'g1');
       expect(result.prediction, Prediction.teamAWins);
-      expect(result.createdAt, DateTime.utc(2026, 6, 10, 9, 0));
+      expect(result.submittedAt, DateTime.utc(2026, 6, 10, 9, 0));
     });
 
-    test('parses createdAt as UTC', () {
+    test('parses submittedAt as UTC', () {
       final result = Guess.fromJson({
         'userId': 'u',
         'gameId': 'g',
         'prediction': 'draw',
-        'createdAt': '2026-06-10T09:00:00.000Z',
+        'submittedAt': '2026-06-10T09:00:00.000Z',
       });
 
-      expect(result.createdAt.isUtc, isTrue);
+      expect(result.submittedAt.isUtc, isTrue);
     });
 
     test('parses all three prediction values', () {
-      DateTime t = DateTime.utc(2026, 6, 10);
+      final t = DateTime.utc(2026, 6, 10).toIso8601String();
       expect(
-        Guess.fromJson({'userId': 'u', 'gameId': 'g', 'prediction': 'teamAWins', 'createdAt': t.toIso8601String()}).prediction,
+        Guess.fromJson({'userId': 'u', 'gameId': 'g', 'prediction': 'teamAWins', 'submittedAt': t}).prediction,
         Prediction.teamAWins,
       );
       expect(
-        Guess.fromJson({'userId': 'u', 'gameId': 'g', 'prediction': 'teamBWins', 'createdAt': t.toIso8601String()}).prediction,
+        Guess.fromJson({'userId': 'u', 'gameId': 'g', 'prediction': 'teamBWins', 'submittedAt': t}).prediction,
         Prediction.teamBWins,
       );
       expect(
-        Guess.fromJson({'userId': 'u', 'gameId': 'g', 'prediction': 'draw', 'createdAt': t.toIso8601String()}).prediction,
+        Guess.fromJson({'userId': 'u', 'gameId': 'g', 'prediction': 'draw', 'submittedAt': t}).prediction,
         Prediction.draw,
       );
     });
@@ -61,7 +61,7 @@ void main() {
       expect(json['userId'], 'uid-abc');
       expect(json['gameId'], 'g1');
       expect(json['prediction'], 'teamAWins');
-      expect(json['createdAt'], '2026-06-10T09:00:00.000Z');
+      expect(json['submittedAt'], '2026-06-10T09:00:00.000Z');
     });
   });
 
@@ -92,31 +92,52 @@ void main() {
     });
   });
 
-  group('copyWith', () {
-    test('updates prediction without changing other fields', () {
-      final updated = guess.copyWith(prediction: Prediction.draw);
+  group('submittedAt updates on every save', () {
+    test('changing prediction creates a new Guess with a later submittedAt', () {
+      final original = Guess(
+        userId: 'uid-abc',
+        gameId: 'g1',
+        prediction: Prediction.teamAWins,
+        submittedAt: DateTime.utc(2026, 6, 10, 12, 0), // guessed at 12:00
+      );
+      final updated = Guess(
+        userId: 'uid-abc',
+        gameId: 'g1',
+        prediction: Prediction.draw,
+        submittedAt: DateTime.utc(2026, 6, 10, 15, 0), // changed at 15:00
+      );
 
       expect(updated.prediction, Prediction.draw);
-      expect(updated.userId, guess.userId);
-      expect(updated.gameId, guess.gameId);
-      expect(updated.createdAt, guess.createdAt);
+      expect(updated.submittedAt.isAfter(original.submittedAt), isTrue);
     });
 
-    test('createdAt is preserved — it is set once and never changed', () {
-      final updated = guess.copyWith(prediction: Prediction.teamBWins);
-      expect(updated.createdAt, guess.createdAt);
+    test('later submittedAt loses the tiebreaker', () {
+      final early = Guess(
+        userId: 'uid-1',
+        gameId: 'g1',
+        prediction: Prediction.teamAWins,
+        submittedAt: DateTime.utc(2026, 6, 10, 8, 0),
+      );
+      final late = Guess(
+        userId: 'uid-2',
+        gameId: 'g1',
+        prediction: Prediction.teamAWins,
+        submittedAt: DateTime.utc(2026, 6, 10, 15, 0),
+      );
+
+      expect(early.submittedAt.isBefore(late.submittedAt), isTrue);
     });
   });
 
   group('equality', () {
     test('same userId and gameId are equal regardless of prediction', () {
-      final updated = Guess(
+      final other = Guess(
         userId: 'uid-abc',
         gameId: 'g1',
         prediction: Prediction.teamBWins,
-        createdAt: createdAt,
+        submittedAt: submittedAt,
       );
-      expect(guess, equals(updated));
+      expect(guess, equals(other));
     });
 
     test('different userId are not equal', () {
@@ -124,7 +145,7 @@ void main() {
         userId: 'uid-xyz',
         gameId: 'g1',
         prediction: Prediction.teamAWins,
-        createdAt: createdAt,
+        submittedAt: submittedAt,
       );
       expect(guess, isNot(equals(other)));
     });
@@ -134,28 +155,9 @@ void main() {
         userId: 'uid-abc',
         gameId: 'g2',
         prediction: Prediction.teamAWins,
-        createdAt: createdAt,
+        submittedAt: submittedAt,
       );
       expect(guess, isNot(equals(other)));
-    });
-  });
-
-  group('secondary tiebreaker', () {
-    test('earlier createdAt sorts before later createdAt', () {
-      final early = Guess(
-        userId: 'uid-1',
-        gameId: 'g1',
-        prediction: Prediction.teamAWins,
-        createdAt: DateTime.utc(2026, 6, 10, 8, 0),
-      );
-      final late = Guess(
-        userId: 'uid-2',
-        gameId: 'g1',
-        prediction: Prediction.teamAWins,
-        createdAt: DateTime.utc(2026, 6, 10, 10, 0),
-      );
-
-      expect(early.createdAt.isBefore(late.createdAt), isTrue);
     });
   });
 }

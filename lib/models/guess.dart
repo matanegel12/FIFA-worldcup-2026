@@ -6,13 +6,13 @@ class Guess {
   final String userId;
   final String gameId;
   final Prediction prediction;
-  final DateTime createdAt; // UTC — set once on submission, used as secondary tiebreaker
+  final DateTime submittedAt; // UTC — updated on every save, used as secondary leaderboard tiebreaker
 
   const Guess({
     required this.userId,
     required this.gameId,
     required this.prediction,
-    required this.createdAt,
+    required this.submittedAt,
   });
 
   /// Builds the Firestore document ID for this guess.
@@ -23,23 +23,15 @@ class Guess {
         userId: json['userId'] as String,
         gameId: json['gameId'] as String,
         prediction: Prediction.values.byName(json['prediction'] as String),
-        createdAt: DateTime.parse(json['createdAt'] as String).toUtc(),
+        submittedAt: DateTime.parse(json['submittedAt'] as String).toUtc(),
       );
 
   Map<String, dynamic> toJson() => {
         'userId': userId,
         'gameId': gameId,
         'prediction': prediction.name,
-        'createdAt': createdAt.toIso8601String(),
+        'submittedAt': submittedAt.toIso8601String(),
       };
-
-  // createdAt is intentionally excluded — it is set once on creation and never changed.
-  Guess copyWith({Prediction? prediction}) => Guess(
-        userId: userId,
-        gameId: gameId,
-        prediction: prediction ?? this.prediction,
-        createdAt: createdAt,
-      );
 
   @override
   bool operator ==(Object other) =>
