@@ -31,7 +31,7 @@ int _compare(User a, User b) {
   // 2. Earlier scoreReachedAt first. Null means never scored — goes last.
   if (a.scoreReachedAt == null && b.scoreReachedAt == null) {
     return a.id.compareTo(b.id);
-  }3
+  }
   if (a.scoreReachedAt == null) return 1;
   if (b.scoreReachedAt == null) return -1;
 
