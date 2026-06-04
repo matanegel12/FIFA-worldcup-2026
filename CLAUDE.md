@@ -217,6 +217,7 @@ test/                             # Mirrors lib/ structure
 ### Auth
 - Email + password sign up and sign in via **Firebase Authentication**.
 - Persist the session so a returning user stays logged in.
+- Database: **Cloud Firestore** for all app data (users, guesses, scores, leaderboard).
 
 ### Games
 - **Upcoming games** screen: list next fixtures from a real data source.
@@ -313,7 +314,7 @@ Whenever a business function is created:
 | **ViewModels** | Loading state, success state, error state |
 | **Predictions** | Guess locking (cannot change after kickoff), prediction update before kickoff |
 | **Leaderboard** | Ranking order, tiebreaker (earliest score) |
-| **New Results Popup** | Only unseen results shown, acknowledged results never shown again |
+| **New Results Popup** | Uses `lastVisitedAt` on User + `finishedAt` on Game. Show games where `finishedAt > lastVisitedAt`. Update `lastVisitedAt` on popup dismiss. First-time user (`lastVisitedAt == null`) sees nothing. |
 | **Admin Panel** | Reset operations, mock result injection, scoring triggered correctly |
 
 ---
@@ -462,7 +463,9 @@ The project is complete only when all of the following are true:
 |---|---|
 | `mvvm_remepy` | Company MVVM base classes (local path dependency) |
 | `flutter` | UI framework |
-| Firebase Auth | Email sign in / sign up |
+| `firebase_core` | Required by all Firebase packages |
+| `firebase_auth` | Email sign in / sign up |
+| `cloud_firestore` | Database — stores users, guesses, scores, leaderboard |
 | `flutter_lints` | Lint rules |
 
 The `mvvm_remepy` package lives at `../frontend-v2/packages/mvvm_remepy`.
