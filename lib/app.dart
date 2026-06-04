@@ -3,6 +3,8 @@ import 'package:mvvm_remepy/base_page.dart';
 
 import 'pages/auth/sign_in/sign_in_page.dart';
 import 'pages/auth/sign_in/sign_in_vm.dart';
+import 'pages/auth/sign_up/sign_up_page.dart';
+import 'pages/auth/sign_up/sign_up_vm.dart';
 import 'services/repositories/auth_repository/auth_repository.dart';
 import 'services/repositories/auth_repository/firestore_auth_repository.dart';
 
@@ -48,6 +50,9 @@ class App extends StatelessWidget {
       routes: {
         '/sign-in': (_) => SignInPage(
               viewModel: SignInViewModel(authRepository: authRepository),
+            ),
+        '/sign-up': (_) => SignUpPage(
+              viewModel: SignUpViewModel(authRepository: authRepository),
             ),
         '/home': (_) => const Scaffold(
               body: Center(child: Text('Home — coming in later phases')),

@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_remepy/base_page.dart';
 
-import 'sign_in_model.dart';
-import 'sign_in_vm.dart';
+import 'sign_up_model.dart';
+import 'sign_up_vm.dart';
 
-class SignInPage extends BasePage<SignInModel, SignInViewModel> {
-  const SignInPage({required super.viewModel, super.key});
+class SignUpPage extends BasePage<SignUpModel, SignUpViewModel> {
+  const SignUpPage({required super.viewModel, super.key});
 
   @override
-  BasePageState<SignInModel, SignInViewModel, SignInPage> createState() =>
-      _SignInPageState();
+  BasePageState<SignUpModel, SignUpViewModel, SignUpPage> createState() =>
+      _SignUpPageState();
 }
 
-class _SignInPageState extends BasePageState<SignInModel, SignInViewModel, SignInPage> {
+class _SignUpPageState extends BasePageState<SignUpModel, SignUpViewModel, SignUpPage> {
+  final _displayNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
+    _displayNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -48,7 +50,7 @@ class _SignInPageState extends BasePageState<SignInModel, SignInViewModel, SignI
                         const Icon(Icons.sports_soccer, size: 64, color: Color(0xFF1A3A5C)),
                         const SizedBox(height: 8),
                         const Text(
-                          'World Cup 2026',
+                          'Create Account',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -56,6 +58,17 @@ class _SignInPageState extends BasePageState<SignInModel, SignInViewModel, SignI
                           ),
                         ),
                         const SizedBox(height: 40),
+                        TextFormField(
+                          controller: _displayNameController,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: const InputDecoration(
+                            labelText: 'Display Name',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (v) =>
+                              (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
+                        ),
+                        const SizedBox(height: 16),
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -74,8 +87,9 @@ class _SignInPageState extends BasePageState<SignInModel, SignInViewModel, SignI
                             labelText: 'Password',
                             border: OutlineInputBorder(),
                           ),
-                          validator: (v) =>
-                              (v == null || v.trim().isEmpty) ? 'Enter your password' : null,
+                          validator: (v) => (v == null || v.length < 6)
+                              ? 'Password must be at least 6 characters'
+                              : null,
                         ),
                         const SizedBox(height: 24),
                         if (model.errorMessage != null) ...[
@@ -93,9 +107,10 @@ class _SignInPageState extends BasePageState<SignInModel, SignInViewModel, SignI
                                 ? null
                                 : () {
                                     if (_formKey.currentState!.validate()) {
-                                      viewModel.signIn(
+                                      viewModel.signUp(
                                         _emailController.text.trim(),
                                         _passwordController.text,
+                                        _displayNameController.text.trim(),
                                       );
                                     }
                                   },
@@ -108,13 +123,13 @@ class _SignInPageState extends BasePageState<SignInModel, SignInViewModel, SignI
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text('Sign In'),
+                                : const Text('Sign Up'),
                           ),
                         ),
                         const SizedBox(height: 16),
                         TextButton(
-                          onPressed: viewModel.goToSignUp,
-                          child: const Text("Don't have an account? Sign Up"),
+                          onPressed: viewModel.goToSignIn,
+                          child: const Text('Already have an account? Sign In'),
                         ),
                       ],
                     ),
