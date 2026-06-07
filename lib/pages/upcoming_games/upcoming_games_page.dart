@@ -4,6 +4,7 @@ import 'package:mvvm_remepy/base_page.dart';
 import '../../app_theme.dart';
 import '../../models/game.dart';
 import '../../models/round_group.dart';
+import '../../widgets/shared/main_bottom_nav.dart';
 import 'upcoming_games_model.dart';
 import 'upcoming_games_vm.dart';
 import 'widgets/upcoming_game_card.dart';
@@ -38,6 +39,13 @@ class _UpcomingGamesPageState
 
   @override
   Color get backgroundColor => AppTheme.surface;
+
+  @override
+  Widget? get bottomNavigationBar => MainBottomNav(
+        onLeaderboardTapped: () {}, // TODO: wire navigation in later phase
+        onPredictionsTapped: () {}, // TODO: wire navigation in later phase
+        currentIndex: -1, // neither tab is active on this page
+      );
 
   @override
   PreferredSizeWidget? get appBar => AppBar(
