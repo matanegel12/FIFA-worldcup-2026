@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_remepy/base_page.dart';
 
+import '../../../../widgets/shared/spinning_ball.dart';
 import 'auth_gate_model.dart';
 import 'auth_gate_vm.dart';
 
@@ -12,25 +13,8 @@ class AuthGatePage extends BasePage<AuthGateModel, AuthGateViewModel> {
       _AuthGatePageState();
 }
 
-class _AuthGatePageState extends BasePageState<AuthGateModel, AuthGateViewModel, AuthGatePage>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _spinController;
-
-  @override
-  void initState() {
-    super.initState(); // wires the ViewModel and calls onViewLoaded
-    _spinController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _spinController.dispose();
-    super.dispose();
-  }
-
+class _AuthGatePageState
+    extends BasePageState<AuthGateModel, AuthGateViewModel, AuthGatePage> {
   @override
   Color get backgroundColor => Colors.white;
 
@@ -48,9 +32,6 @@ class _AuthGatePageState extends BasePageState<AuthGateModel, AuthGateViewModel,
                   textAlign: TextAlign.center,
                 ),
               )
-            : RotationTransition(
-                turns: _spinController,
-                child: const Text('⚽', style: TextStyle(fontSize: 64)),
-              ),
+            : const SpinningBall(),
       );
 }
