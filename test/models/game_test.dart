@@ -209,6 +209,91 @@ void main() {
     });
   });
 
+  group('round', () {
+    test('fromJson parses round string', () {
+      final game = Game.fromJson({
+        'id': 'g1',
+        'homeTeam': mexico.toJson(),
+        'awayTeam': brazil.toJson(),
+        'kickoffTime': '2026-06-11T15:00:00.000Z',
+        'homeScore': null,
+        'awayScore': null,
+        'status': 'upcoming',
+        'finishedAt': null,
+        'round': 'Matchday 8',
+      });
+      expect(game.round, 'Matchday 8');
+    });
+
+    test('toJson includes round', () {
+      final game = Game(
+        id: 'g1',
+        homeTeam: mexico,
+        awayTeam: brazil,
+        kickoffTime: DateTime.utc(2026, 6, 11, 15, 0),
+        status: GameStatus.upcoming,
+        round: 'Matchday 1',
+      );
+      expect(game.toJson()['round'], 'Matchday 1');
+    });
+
+    test('defaults to empty string when not provided', () {
+      expect(upcomingGame.round, '');
+    });
+  });
+
+  group('ground', () {
+    test('fromJson parses ground string', () {
+      final Game game = Game.fromJson({
+        'id': 'g1',
+        'homeTeam': mexico.toJson(),
+        'awayTeam': brazil.toJson(),
+        'kickoffTime': '2026-06-11T15:00:00.000Z',
+        'homeScore': null,
+        'awayScore': null,
+        'status': 'upcoming',
+        'finishedAt': null,
+        'round': 'Matchday 1',
+        'ground': 'Mexico City',
+      });
+      expect(game.ground, 'Mexico City');
+    });
+
+    test('fromJson falls back to empty string when ground is absent', () {
+      final Game game = Game.fromJson({
+        'id': 'g1',
+        'homeTeam': mexico.toJson(),
+        'awayTeam': brazil.toJson(),
+        'kickoffTime': '2026-06-11T15:00:00.000Z',
+        'homeScore': null,
+        'awayScore': null,
+        'status': 'upcoming',
+        'finishedAt': null,
+      });
+      expect(game.ground, '');
+    });
+
+    test('toJson includes ground', () {
+      final Game game = Game(
+        id: 'g1',
+        homeTeam: mexico,
+        awayTeam: brazil,
+        kickoffTime: DateTime.utc(2026, 6, 11, 15, 0),
+        status: GameStatus.upcoming,
+        ground: 'Estadio Azteca',
+      );
+      expect(game.toJson()['ground'], 'Estadio Azteca');
+    });
+
+    test('toJson includes empty string when ground not provided', () {
+      expect(upcomingGame.toJson()['ground'], '');
+    });
+
+    test('defaults to empty string when not provided in constructor', () {
+      expect(upcomingGame.ground, '');
+    });
+  });
+
   group('equality', () {
     test('two games with same id are equal', () {
       final other = Game(

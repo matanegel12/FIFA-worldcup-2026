@@ -21,7 +21,8 @@ class FirestoreGamesRepository implements GamesRepository {
   @override
   Future<List<Game>> fetchUpcomingGames() async {
     final snap = await _col
-        .where('status', isEqualTo: GameStatus.upcoming.name)
+        .where('kickoffTime',
+            isGreaterThan: DateTime.now().toUtc().toIso8601String())
         .orderBy('kickoffTime')
         .get();
     return snap.docs.map((d) => Game.fromJson(d.data())).toList();

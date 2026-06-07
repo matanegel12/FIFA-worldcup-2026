@@ -6,11 +6,15 @@ class Guess {
   final String userId;
   final String gameId;
   final Prediction prediction;
+  final int? predictedHomeScore;
+  final int? predictedAwayScore;
 
   const Guess({
     required this.userId,
     required this.gameId,
     required this.prediction,
+    this.predictedHomeScore,
+    this.predictedAwayScore,
   });
 
   /// Builds the Firestore document ID for this guess.
@@ -21,12 +25,16 @@ class Guess {
         userId: json['userId'] as String,
         gameId: json['gameId'] as String,
         prediction: Prediction.values.byName(json['prediction'] as String),
+        predictedHomeScore: json['predictedHomeScore'] as int?,
+        predictedAwayScore: json['predictedAwayScore'] as int?,
       );
 
   Map<String, dynamic> toJson() => {
         'userId': userId,
         'gameId': gameId,
         'prediction': prediction.name,
+        'predictedHomeScore': predictedHomeScore,
+        'predictedAwayScore': predictedAwayScore,
       };
 
   @override

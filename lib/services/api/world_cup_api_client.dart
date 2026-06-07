@@ -72,6 +72,8 @@ class WorldCupApiClient {
       awayScore: awayScore,
       status: isFinished ? GameStatus.finished : GameStatus.upcoming,
       finishedAt: finishedAt,
+      round: match['round'] as String? ?? '',
+      ground: match['ground'] as String? ?? '',
     );
   }
 

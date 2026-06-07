@@ -74,6 +74,79 @@ void main() {
     });
   });
 
+  group('predictedHomeScore / predictedAwayScore', () {
+    test('fromJson parses non-null score predictions', () {
+      final Guess result = Guess.fromJson({
+        'userId': 'uid-abc',
+        'gameId': 'g1',
+        'prediction': 'teamAWins',
+        'predictedHomeScore': 2,
+        'predictedAwayScore': 1,
+      });
+      expect(result.predictedHomeScore, 2);
+      expect(result.predictedAwayScore, 1);
+    });
+
+    test('fromJson parses null score predictions', () {
+      final Guess result = Guess.fromJson({
+        'userId': 'uid-abc',
+        'gameId': 'g1',
+        'prediction': 'draw',
+        'predictedHomeScore': null,
+        'predictedAwayScore': null,
+      });
+      expect(result.predictedHomeScore, isNull);
+      expect(result.predictedAwayScore, isNull);
+    });
+
+    test('fromJson defaults scores to null when fields are absent', () {
+      final Guess result = Guess.fromJson({
+        'userId': 'uid-abc',
+        'gameId': 'g1',
+        'prediction': 'draw',
+      });
+      expect(result.predictedHomeScore, isNull);
+      expect(result.predictedAwayScore, isNull);
+    });
+
+    test('toJson includes non-null score predictions', () {
+      const Guess withScores = Guess(
+        userId: 'uid-abc',
+        gameId: 'g1',
+        prediction: Prediction.teamAWins,
+        predictedHomeScore: 3,
+        predictedAwayScore: 0,
+      );
+      final Map<String, dynamic> json = withScores.toJson();
+      expect(json['predictedHomeScore'], 3);
+      expect(json['predictedAwayScore'], 0);
+    });
+
+    test('toJson serializes null scores as null', () {
+      final Map<String, dynamic> json = guess.toJson();
+      expect(json['predictedHomeScore'], isNull);
+      expect(json['predictedAwayScore'], isNull);
+    });
+
+    test('round-trip preserves non-null scores', () {
+      const Guess withScores = Guess(
+        userId: 'uid-abc',
+        gameId: 'g1',
+        prediction: Prediction.teamBWins,
+        predictedHomeScore: 1,
+        predictedAwayScore: 2,
+      );
+      final Guess restored = Guess.fromJson(withScores.toJson());
+      expect(restored.predictedHomeScore, 1);
+      expect(restored.predictedAwayScore, 2);
+    });
+
+    test('defaults to null when not provided in constructor', () {
+      expect(guess.predictedHomeScore, isNull);
+      expect(guess.predictedAwayScore, isNull);
+    });
+  });
+
   group('equality', () {
     test('same userId and gameId are equal regardless of prediction', () {
       const other = Guess(

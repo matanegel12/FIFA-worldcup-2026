@@ -16,14 +16,14 @@ void main() {
     id: 'g1',
     homeTeam: mexico,
     awayTeam: brazil,
-    kickoffTime: DateTime.utc(2026, 6, 11, 15, 0),
+    kickoffTime: DateTime.utc(2099, 6, 11, 15, 0),
     status: GameStatus.upcoming,
   );
   final game2 = Game(
     id: 'g2',
     homeTeam: brazil,
     awayTeam: mexico,
-    kickoffTime: DateTime.utc(2026, 6, 12, 15, 0),
+    kickoffTime: DateTime.utc(2099, 6, 12, 15, 0),
     status: GameStatus.upcoming,
   );
 
@@ -51,7 +51,7 @@ void main() {
         gameId: 'g1',
         homeScore: 2,
         awayScore: 1,
-        finishedAt: DateTime.utc(2026, 6, 11, 17, 0),
+        finishedAt: DateTime.utc(2099, 6, 11, 17, 0),
       );
 
       final updated = MockStore.instance.finishedGames.first;
@@ -67,11 +67,16 @@ void main() {
         gameId: 'g1',
         homeScore: 1,
         awayScore: 1,
-        finishedAt: DateTime.utc(2026, 6, 11, 17, 0),
+        finishedAt: DateTime.utc(2099, 6, 11, 17, 0),
       );
 
       expect(MockStore.instance.finishedGames.length, 1);
-      expect(MockStore.instance.upcomingGames.length, 1);
+      // upcomingGames filters by kickoff time only — both games still have future
+      // kickoffs, so both appear. Use games + status filter to check non-finished.
+      expect(
+        MockStore.instance.games.where((Game g) => !g.isFinished).length,
+        1,
+      );
     });
   });
 
@@ -149,7 +154,7 @@ void main() {
         gameId: 'g1',
         homeScore: 2,
         awayScore: 0,
-        finishedAt: DateTime.utc(2026, 6, 11, 17, 0),
+        finishedAt: DateTime.utc(2099, 6, 11, 17, 0),
       );
     });
 
@@ -169,7 +174,7 @@ void main() {
     });
 
     test('resetDay resets only games and guesses on that day', () {
-      MockStore.instance.resetDay(DateTime.utc(2026, 6, 11));
+      MockStore.instance.resetDay(DateTime.utc(2099, 6, 11));
 
       expect(MockStore.instance.finishedGames, isEmpty);
       expect(MockStore.instance.allGuesses, isEmpty);

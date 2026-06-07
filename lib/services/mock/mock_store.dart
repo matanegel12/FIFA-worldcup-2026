@@ -22,8 +22,9 @@ class MockStore {
 
   List<Game> get games => List.unmodifiable(_games);
 
-  List<Game> get upcomingGames =>
-      _games.where((g) => !g.isFinished).toList();
+  List<Game> get upcomingGames => _games
+      .where((g) => g.kickoffTime.isAfter(DateTime.now().toUtc()))
+      .toList();
 
   List<Game> get finishedGames =>
       _games.where((g) => g.isFinished).toList();
@@ -54,6 +55,8 @@ class MockStore {
       homeTeam: _games[index].homeTeam,
       awayTeam: _games[index].awayTeam,
       kickoffTime: _games[index].kickoffTime,
+      round: _games[index].round,
+      ground: _games[index].ground,
       homeScore: homeScore,
       awayScore: awayScore,
       status: GameStatus.finished,
@@ -123,6 +126,8 @@ class MockStore {
         homeTeam: g.homeTeam,
         awayTeam: g.awayTeam,
         kickoffTime: g.kickoffTime,
+        round: g.round,
+        ground: g.ground,
         status: GameStatus.upcoming,
       );
     }).toList();
