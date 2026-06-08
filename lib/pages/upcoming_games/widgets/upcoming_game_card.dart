@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app_theme.dart';
 import '../../../models/game.dart';
 import '../../../models/guess.dart';
-import '../../../models/team.dart';
+import '../../../widgets/shared/team_flag.dart';
 
 class UpcomingGameCard extends StatelessWidget {
   final Game game;
@@ -54,7 +54,7 @@ class UpcomingGameCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildFlag(game.homeTeam),
+            TeamFlag(flagUrl: game.homeTeam.flagUrl),
             const Text(
               'Place your bet',
               style: TextStyle(
@@ -64,7 +64,7 @@ class UpcomingGameCard extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            _buildFlag(game.awayTeam),
+            TeamFlag(flagUrl: game.awayTeam.flagUrl),
           ],
         ),
         const SizedBox(height: 4),
@@ -77,24 +77,6 @@ class UpcomingGameCard extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildFlag(Team team) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: Image.network(
-        team.flagUrl,
-        width: 48,
-        height: 32,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-          width: 48,
-          height: 32,
-          color: Colors.grey.shade200,
-          child: Icon(Icons.flag, size: 16, color: Colors.grey.shade400),
-        ),
-      ),
     );
   }
 

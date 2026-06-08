@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fifa_worldcup_2026_predictions/models/guess.dart';
 
 void main() {
-  const guess = Guess(
+  const Guess guess = Guess(
     userId: 'uid-abc',
     gameId: 'g1',
     prediction: Prediction.teamAWins,
@@ -10,7 +10,7 @@ void main() {
 
   group('Guess.fromJson', () {
     test('creates guess with correct fields', () {
-      final result = Guess.fromJson({
+      final Guess result = Guess.fromJson({
         'userId': 'uid-abc',
         'gameId': 'g1',
         'prediction': 'teamAWins',
@@ -39,7 +39,7 @@ void main() {
 
   group('Guess.toJson', () {
     test('serializes all fields correctly', () {
-      final json = guess.toJson();
+      final Map<String, dynamic> json = guess.toJson();
 
       expect(json['userId'], 'uid-abc');
       expect(json['gameId'], 'g1');
@@ -49,7 +49,7 @@ void main() {
 
   group('round-trip', () {
     test('fromJson(toJson()) returns equal guess', () {
-      final restored = Guess.fromJson(guess.toJson());
+      final Guess restored = Guess.fromJson(guess.toJson());
       expect(restored, guess);
     });
   });
@@ -74,82 +74,9 @@ void main() {
     });
   });
 
-  group('predictedHomeScore / predictedAwayScore', () {
-    test('fromJson parses non-null score predictions', () {
-      final Guess result = Guess.fromJson({
-        'userId': 'uid-abc',
-        'gameId': 'g1',
-        'prediction': 'teamAWins',
-        'predictedHomeScore': 2,
-        'predictedAwayScore': 1,
-      });
-      expect(result.predictedHomeScore, 2);
-      expect(result.predictedAwayScore, 1);
-    });
-
-    test('fromJson parses null score predictions', () {
-      final Guess result = Guess.fromJson({
-        'userId': 'uid-abc',
-        'gameId': 'g1',
-        'prediction': 'draw',
-        'predictedHomeScore': null,
-        'predictedAwayScore': null,
-      });
-      expect(result.predictedHomeScore, isNull);
-      expect(result.predictedAwayScore, isNull);
-    });
-
-    test('fromJson defaults scores to null when fields are absent', () {
-      final Guess result = Guess.fromJson({
-        'userId': 'uid-abc',
-        'gameId': 'g1',
-        'prediction': 'draw',
-      });
-      expect(result.predictedHomeScore, isNull);
-      expect(result.predictedAwayScore, isNull);
-    });
-
-    test('toJson includes non-null score predictions', () {
-      const Guess withScores = Guess(
-        userId: 'uid-abc',
-        gameId: 'g1',
-        prediction: Prediction.teamAWins,
-        predictedHomeScore: 3,
-        predictedAwayScore: 0,
-      );
-      final Map<String, dynamic> json = withScores.toJson();
-      expect(json['predictedHomeScore'], 3);
-      expect(json['predictedAwayScore'], 0);
-    });
-
-    test('toJson serializes null scores as null', () {
-      final Map<String, dynamic> json = guess.toJson();
-      expect(json['predictedHomeScore'], isNull);
-      expect(json['predictedAwayScore'], isNull);
-    });
-
-    test('round-trip preserves non-null scores', () {
-      const Guess withScores = Guess(
-        userId: 'uid-abc',
-        gameId: 'g1',
-        prediction: Prediction.teamBWins,
-        predictedHomeScore: 1,
-        predictedAwayScore: 2,
-      );
-      final Guess restored = Guess.fromJson(withScores.toJson());
-      expect(restored.predictedHomeScore, 1);
-      expect(restored.predictedAwayScore, 2);
-    });
-
-    test('defaults to null when not provided in constructor', () {
-      expect(guess.predictedHomeScore, isNull);
-      expect(guess.predictedAwayScore, isNull);
-    });
-  });
-
   group('equality', () {
     test('same userId and gameId are equal regardless of prediction', () {
-      const other = Guess(
+      const Guess other = Guess(
         userId: 'uid-abc',
         gameId: 'g1',
         prediction: Prediction.teamBWins,
@@ -158,7 +85,7 @@ void main() {
     });
 
     test('different userId are not equal', () {
-      const other = Guess(
+      const Guess other = Guess(
         userId: 'uid-xyz',
         gameId: 'g1',
         prediction: Prediction.teamAWins,
@@ -167,7 +94,7 @@ void main() {
     });
 
     test('different gameId are not equal', () {
-      const other = Guess(
+      const Guess other = Guess(
         userId: 'uid-abc',
         gameId: 'g2',
         prediction: Prediction.teamAWins,

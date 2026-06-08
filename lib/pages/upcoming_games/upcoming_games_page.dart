@@ -5,6 +5,8 @@ import '../../app_theme.dart';
 import '../../models/game.dart';
 import '../../models/round_group.dart';
 import '../../widgets/shared/main_bottom_nav.dart';
+import '../../widgets/shared/page_empty_view.dart';
+import '../../widgets/shared/page_error_view.dart';
 import 'upcoming_games_model.dart';
 import 'upcoming_games_vm.dart';
 import 'widgets/upcoming_game_card.dart';
@@ -82,44 +84,16 @@ class _UpcomingGamesPageState
   // ── Error state ───────────────────────────────────────────────────────────
 
   Widget _buildError() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              model.errorMessage!,
-              style: const TextStyle(fontSize: 16, color: Colors.red),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: viewModel.loadGames,
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
+    return PageErrorView(
+      message: model.errorMessage!,
+      onRetry: viewModel.loadGames,
     );
   }
 
   // ── Empty state ───────────────────────────────────────────────────────────
 
   Widget _buildEmpty() {
-    return const Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('⚽', style: TextStyle(fontSize: 64)),
-          SizedBox(height: 12),
-          Text(
-            'No upcoming games',
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-        ],
-      ),
-    );
+    return const PageEmptyView(message: 'No upcoming games');
   }
 
   // ── Data — grouped list ───────────────────────────────────────────────────

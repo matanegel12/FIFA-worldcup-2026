@@ -8,6 +8,10 @@ import 'pages/auth/sign_in/sign_in_page.dart';
 import 'pages/auth/sign_in/sign_in_vm.dart';
 import 'pages/auth/sign_up/sign_up_page.dart';
 import 'pages/auth/sign_up/sign_up_vm.dart';
+import 'pages/predictions/predictions_page.dart';
+import 'pages/predictions/predictions_vm.dart';
+import 'pages/results/results_page.dart';
+import 'pages/results/results_vm.dart';
 import 'pages/upcoming_games/upcoming_games_page.dart';
 import 'pages/upcoming_games/upcoming_games_vm.dart';
 import 'services/mock/mock_store.dart';
@@ -50,8 +54,20 @@ class App extends StatelessWidget {
                 viewModel: SignUpViewModel(authRepository: authRepository),
               ),
             ),
-        '/home': (_) => UpcomingGamesPage(
-              viewModel: UpcomingGamesViewModel(
+        // '/home': (_) => UpcomingGamesPage(
+        //       viewModel: UpcomingGamesViewModel(
+        //         gamesRepository: MockGamesRepository(),
+        //         guessesRepository: MockGuessesRepository(),
+        //         userId: MockStore.instance.currentUserId ?? '',
+        //       ),
+        //     ),
+        '/results': (_) => ResultsPage(
+              viewModel: ResultsViewModel(
+                gamesRepository: MockGamesRepository(),
+              ),
+            ),
+        '/home': (_) => PredictionsPage(
+              viewModel: PredictionsViewModel(
                 gamesRepository: MockGamesRepository(),
                 guessesRepository: MockGuessesRepository(),
                 userId: MockStore.instance.currentUserId ?? '',

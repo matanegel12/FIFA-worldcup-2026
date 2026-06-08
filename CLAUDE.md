@@ -380,7 +380,7 @@ Build: `PredictionsPage` with Team A Win / Team B Win / Draw selection.
 Requirements:
 - Guesses lock at kickoff.
 - Locked guesses are visually distinct from editable ones.
-
+1
 Create tests immediately.
 
 ### Phase 8 — Results

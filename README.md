@@ -16,7 +16,7 @@ Run this once after cloning to connect the app to your Firebase project:
 
 ```bash
 flutterfire configure
-```
+``` 
 
 This generates `lib/firebase_options.dart` which is not committed to the repo.
 

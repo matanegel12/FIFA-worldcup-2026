@@ -29,9 +29,9 @@ class PredictionSummary {
   }
 
   /// Display text for what the user predicted.
-  /// Returns "No prediction yet" when the user has not submitted a guess.
+  /// Returns "Didn't predict" when the user has not submitted a guess.
   String get predictionDisplayText {
-    if (guess == null) return 'No prediction yet';
+    if (guess == null) return "Didn't predict";
     if (guess!.prediction == Prediction.teamAWins) return game.homeTeam.name;
     if (guess!.prediction == Prediction.teamBWins) return game.awayTeam.name;
     return 'Draw';
