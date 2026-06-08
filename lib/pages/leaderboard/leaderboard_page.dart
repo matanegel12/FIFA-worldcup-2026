@@ -3,7 +3,6 @@ import 'package:mvvm_remepy/base_page.dart';
 
 import '../../app_theme.dart';
 import '../../models/leaderboard_entry.dart';
-import '../../widgets/shared/main_bottom_nav.dart';
 import '../../widgets/shared/page_empty_view.dart';
 import '../../widgets/shared/page_error_view.dart';
 import '../../widgets/shared/spinning_ball.dart';
@@ -28,14 +27,6 @@ class _LeaderboardPageState
   @override
   PreferredSizeWidget? get appBar => AppBar(
         title: Text(model.appBarTitle),
-      );
-
-  @override
-  Widget? get bottomNavigationBar => MainBottomNav(
-        onResultsTapped: () {},
-        onLeaderboardTapped: () {},
-        onPredictionsTapped: () {},
-        currentIndex: 1, // leaderboard tab is active
       );
 
   @override

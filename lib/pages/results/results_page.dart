@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mvvm_remepy/base_page.dart';
 
 import '../../models/game.dart';
-import '../../widgets/shared/main_bottom_nav.dart';
 import '../../widgets/shared/page_empty_view.dart';
 import '../../widgets/shared/page_error_view.dart';
 import '../../widgets/shared/spinning_ball.dart';
@@ -26,14 +25,6 @@ class _ResultsPageState
   @override
   PreferredSizeWidget? get appBar => AppBar(
         title: Text(model.appBarTitle),
-      );
-
-  @override
-  Widget? get bottomNavigationBar => MainBottomNav(
-        onResultsTapped: () {},
-        onLeaderboardTapped: () {},
-        onPredictionsTapped: () {},
-        currentIndex: 0, // results tab is active
       );
 
   @override
