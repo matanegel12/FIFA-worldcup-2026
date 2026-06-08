@@ -42,9 +42,10 @@ class _UpcomingGamesPageState
 
   @override
   Widget? get bottomNavigationBar => MainBottomNav(
-        onLeaderboardTapped: () {}, // TODO: wire navigation in later phase
-        onPredictionsTapped: () {}, // TODO: wire navigation in later phase
-        currentIndex: -1, // neither tab is active on this page
+        onResultsTapped: () {},     // TODO: wire in results phase
+        onLeaderboardTapped: () {}, // TODO: wire in leaderboard phase
+        onPredictionsTapped: () {}, // TODO: wire in predictions phase
+        currentIndex: -1,           // no tab active on upcoming games page
       );
 
   @override

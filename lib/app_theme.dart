@@ -13,10 +13,14 @@ class AppTheme {
   static const Color surface = Color(0xFFF2F2F7);          // light grey background
   static const Color cardColor = Colors.white;             // white cards
   static const Color lockedBannerBg = Color(0xFFFFECB3);   // light amber yellow
-  static const Color textPrimary = Color(0xFF212121);      // near black — main text
-  static const Color textSecondary = Color(0xFF757575);    // medium grey — secondary text
-  static const Color correct = Color(0xFF66BB6A);          // green — correct prediction
-  static const Color incorrect = Color(0xFFFF7043);        // deep orange — incorrect prediction
+  static const Color textPrimary = Color(0xFF212121);          // near black — main text
+  static const Color textSecondary = Color(0xFF757575);        // medium grey — secondary text
+  static const Color correct = Color(0xFF66BB6A);              // green — correct prediction
+  static const Color incorrect = Color(0xFFFF7043);            // deep orange — incorrect prediction
+  static const Color prominentButtonIcon = Color(0xFF000000);  // black — icon on gold button
+  static const Color navBarBackground = Color(0xFFFFFFFF);     // white — nav bar background
+  static const Color navBarBorder = Color(0x1F000000);         // black 12% — subtle top border
+  static const Color navInactive = Color(0x61000000);          // black 38% — inactive icon
 
   /// Alias for [surface] — use when setting page background colors.
   static const Color backgroundColor = surface;
