@@ -17,30 +17,33 @@ class MainBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      color: const Color(0xFF000000), // black — matches app bar
+      color: Colors.white,
       elevation: 0,
       padding: EdgeInsets.zero,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _NavButton(
-            icon: Icons.star,
-            tooltip: 'Leaderboard',
-            isActive: currentIndex == 0,
-            isCircle: true,
-            activeColor: AppTheme.secondary, // gold yellow when active
-            onTap: onLeaderboardTapped,
-          ),
-          const SizedBox(width: 16),
-          _NavButton(
-            icon: Icons.grid_view,
-            tooltip: 'My Predictions',
-            isActive: currentIndex == 1,
-            isCircle: false,
-            activeColor: AppTheme.primary, // deep red when active
-            onTap: onPredictionsTapped,
-          ),
-        ],
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.black12)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _NavButton(
+              icon: Icons.star,
+              tooltip: 'Leaderboard',
+              isActive: currentIndex == 0,
+              isCircle: true,
+              onTap: onLeaderboardTapped,
+            ),
+            const SizedBox(width: 16),
+            _NavButton(
+              icon: Icons.grid_view,
+              tooltip: 'My Predictions',
+              isActive: currentIndex == 1,
+              isCircle: false,
+              onTap: onPredictionsTapped,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -53,7 +56,6 @@ class _NavButton extends StatefulWidget {
   final String tooltip;
   final bool isActive;
   final bool isCircle; // true = circular shape, false = rounded square
-  final Color activeColor;
   final VoidCallback onTap;
 
   const _NavButton({
@@ -61,7 +63,6 @@ class _NavButton extends StatefulWidget {
     required this.tooltip,
     required this.isActive,
     required this.isCircle,
-    required this.activeColor,
     required this.onTap,
   });
 
@@ -80,10 +81,7 @@ class _NavButtonState extends State<_NavButton> {
 
     return Tooltip(
       message: widget.tooltip,
-      textStyle: const TextStyle(
-        color: Colors.white,
-        fontSize: 11,
-      ),
+      textStyle: const TextStyle(color: Colors.white, fontSize: 11),
       decoration: BoxDecoration(
         color: Colors.grey.shade700,
         borderRadius: BorderRadius.circular(4),
@@ -99,15 +97,13 @@ class _NavButtonState extends State<_NavButton> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: _isHovered ? Colors.grey.shade200 : Colors.white,
+              color: _isHovered ? Colors.grey.shade100 : Colors.white,
               borderRadius: borderRadius,
             ),
             child: Icon(
               widget.icon,
               size: 26,
-              color: widget.isActive
-                  ? widget.activeColor
-                  : Colors.black54,
+              color: widget.isActive ? AppTheme.secondary : Colors.black38,
             ),
           ),
         ),

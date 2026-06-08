@@ -38,7 +38,7 @@ class _UpcomingGamesPageState
   }
 
   @override
-  Color get backgroundColor => AppTheme.surface;
+  Color get backgroundColor => Theme.of(context).colorScheme.surface;
 
   @override
   Widget? get bottomNavigationBar => MainBottomNav(
@@ -161,7 +161,7 @@ class _UpcomingGamesPageState
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
-          color: AppTheme.primary,
+          color: Colors.black87,
           letterSpacing: 0.5,
         ),
       ),
@@ -175,7 +175,7 @@ class _UpcomingGamesPageState
       decoration: BoxDecoration(
         color: AppTheme.lockedBannerBg,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.secondary),
+        border: Border.all(color: AppTheme.primary),
       ),
       child: Text(
         '🔒 Opens after $round ends',

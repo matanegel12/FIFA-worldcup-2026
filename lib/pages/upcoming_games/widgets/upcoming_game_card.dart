@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app_theme.dart';
 import '../../../models/game.dart';
 import '../../../models/guess.dart';
 import '../../../models/team.dart';
@@ -58,7 +59,7 @@ class UpcomingGameCard extends StatelessWidget {
               'Place your bet',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white,
+                color: Colors.black54,
                 fontWeight: FontWeight.normal,
               ),
               textAlign: TextAlign.center,
@@ -90,8 +91,8 @@ class UpcomingGameCard extends StatelessWidget {
         errorBuilder: (_, __, ___) => Container(
           width: 48,
           height: 32,
-          color: Colors.white24,
-          child: const Icon(Icons.flag, size: 16, color: Colors.white54),
+          color: Colors.grey.shade200,
+          child: Icon(Icons.flag, size: 16, color: Colors.grey.shade400),
         ),
       ),
     );
@@ -102,7 +103,7 @@ class UpcomingGameCard extends StatelessWidget {
       width: 80,
       child: Text(
         name,
-        style: const TextStyle(fontSize: 11, color: Colors.white),
+        style: const TextStyle(fontSize: 11, color: Colors.black87),
         textAlign: align,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
@@ -114,11 +115,11 @@ class UpcomingGameCard extends StatelessWidget {
 
   Widget _buildPredictionSection(BuildContext context) {
     if (!isMatchdayUnlocked) {
-      return Text(
-        '🔒 Opens after ${game.round} ends',
-        style: const TextStyle(
+      return const Text(
+        '🔒 Locked — previous matchday not finished yet',
+        style: TextStyle(
           fontSize: 11,
-          color: Color(0xFFFFD600),
+          color: AppTheme.primary,
           fontWeight: FontWeight.w500,
         ),
         textAlign: TextAlign.center,
@@ -152,28 +153,30 @@ class UpcomingGameCard extends StatelessWidget {
               }
             },
       style: SegmentedButton.styleFrom(
-        selectedBackgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Colors.white,
+        selectedBackgroundColor: AppTheme.secondary,  // gold when selected
         selectedForegroundColor: Colors.black,
-        foregroundColor: Colors.white70,
+        foregroundColor: Colors.black87,
+        side: const BorderSide(color: Colors.black12),
       ),
     );
   }
 
-  // ── Gold badge ────────────────────────────────────────────────────────────
+  // ── Red badge ─────────────────────────────────────────────────────────────
 
   Widget _buildLockBadge() {
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFFFD600)),
+          border: Border.all(color: AppTheme.primary),
           borderRadius: BorderRadius.circular(20),
         ),
         child: const Text(
           'Guesses lock at kickoff',
           style: TextStyle(
             fontSize: 10,
-            color: Colors.white,
+            color: AppTheme.primary,
             letterSpacing: 0.3,
           ),
         ),
@@ -193,7 +196,7 @@ class UpcomingGameCard extends StatelessWidget {
 
     return Text(
       '🕐 $location',
-      style: const TextStyle(fontSize: 11, color: Colors.white60),
+      style: const TextStyle(fontSize: 11, color: Colors.black54),
       textAlign: TextAlign.center,
     );
   }

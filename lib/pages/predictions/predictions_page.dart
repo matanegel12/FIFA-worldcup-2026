@@ -19,7 +19,7 @@ class PredictionsPage extends BasePage<PredictionsModel, PredictionsViewModel> {
 class _PredictionsPageState
     extends BasePageState<PredictionsModel, PredictionsViewModel, PredictionsPage> {
   @override
-  Color get backgroundColor => AppTheme.backgroundColor;
+  Color get backgroundColor => Theme.of(context).colorScheme.surface;
 
   @override
   PreferredSizeWidget? get appBar => AppBar(
@@ -51,7 +51,7 @@ class _PredictionsPageState
           children: [
             Text(
               model.errorMessage!,
-              style: const TextStyle(fontSize: 16, color: Colors.red),
+              style: const TextStyle(fontSize: 16, color: AppTheme.primary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

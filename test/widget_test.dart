@@ -76,7 +76,7 @@ void main() {
       onPredictionChanged: (_) {},
     )));
 
-    expect(find.textContaining('Opens after'), findsOneWidget);
+    expect(find.textContaining('Locked'), findsOneWidget);
     expect(find.text('Draw'), findsNothing);
   });
 

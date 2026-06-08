@@ -8,10 +8,11 @@ class AppTheme {
   // ── Color constants ───────────────────────────────────────────────────────
   // Use these in page/widget files instead of hardcoded Color(...) literals.
 
-  static const Color primary = Color(0xFFD32F2F);         // deep red
-  static const Color secondary = Color(0xFFFFD600);       // golden yellow
-  static const Color surface = Color(0xFFFFF8E1);         // warm cream white
-  static const Color lockedBannerBg = Color(0xFFFFECB3);  // light amber yellow
+  static const Color primary = Color(0xFFD32F2F);          // deep red
+  static const Color secondary = Color(0xFFFFD600);        // golden yellow
+  static const Color surface = Color(0xFFF2F2F7);          // light grey background
+  static const Color cardColor = Colors.white;             // white cards
+  static const Color lockedBannerBg = Color(0xFFFFECB3);   // light amber yellow
 
   /// Alias for [surface] — use when setting page background colors.
   static const Color backgroundColor = surface;
@@ -20,23 +21,26 @@ class AppTheme {
 
   static final ThemeData light = ThemeData(
     colorScheme: ColorScheme.fromSeed(
-      seedColor: primary,                   // deep red
-      primary: primary,                     // deep red
-      secondary: secondary,                 // golden yellow
-      surface: surface,                     // warm cream white
+      seedColor: primary,       // deep red
+      primary: primary,         // deep red
+      secondary: secondary,     // golden yellow
+      surface: surface,         // light grey
     ),
     useMaterial3: true,
+    scaffoldBackgroundColor: surface,   // light grey page background
     cardTheme: CardThemeData(
-      color: primary,                       // deep red
-      elevation: 3,
+      color: cardColor,                 // white cards
+      elevation: 2,
+      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF000000),   // black
-      foregroundColor: Color(0xFFFFFFFF),   // white
+      backgroundColor: Colors.white,   // white app bar
+      foregroundColor: Colors.black,   // black title and icons
       elevation: 0,
+      shadowColor: Colors.black12,
     ),
   );
 
