@@ -54,19 +54,19 @@ class App extends StatelessWidget {
                 viewModel: SignUpViewModel(authRepository: authRepository),
               ),
             ),
-        // '/home': (_) => UpcomingGamesPage(
-        //       viewModel: UpcomingGamesViewModel(
-        //         gamesRepository: MockGamesRepository(),
-        //         guessesRepository: MockGuessesRepository(),
-        //         userId: MockStore.instance.currentUserId ?? '',
-        //       ),
-        //     ),
+        '/home': (_) => UpcomingGamesPage(
+              viewModel: UpcomingGamesViewModel(
+                gamesRepository: MockGamesRepository(),
+                guessesRepository: MockGuessesRepository(),
+                userId: MockStore.instance.currentUserId ?? '',
+              ),
+            ),
         '/results': (_) => ResultsPage(
               viewModel: ResultsViewModel(
                 gamesRepository: MockGamesRepository(),
               ),
             ),
-        '/home': (_) => PredictionsPage(
+        '/predictions': (_) => PredictionsPage(
               viewModel: PredictionsViewModel(
                 gamesRepository: MockGamesRepository(),
                 guessesRepository: MockGuessesRepository(),
