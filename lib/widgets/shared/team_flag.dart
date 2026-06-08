@@ -24,6 +24,14 @@ class TeamFlag extends StatelessWidget {
         width: width,
         height: height,
         fit: BoxFit.cover,
+        loadingBuilder: (_, Widget child, ImageChunkEvent? progress) {
+          if (progress == null) return child; // fully loaded
+          return Container(
+            width: width,
+            height: height,
+            color: Colors.grey.shade200,
+          );
+        },
         errorBuilder: (_, __, ___) => Container(
           width: width,
           height: height,
