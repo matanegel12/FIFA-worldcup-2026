@@ -1,5 +1,6 @@
 import '../../models/game.dart';
 import '../../models/guess.dart';
+import '../../models/leaderboard_entry.dart';
 import '../../models/team.dart';
 import '../../models/user.dart';
 
@@ -123,3 +124,26 @@ final List<Guess> kFakeGuesses = [
   ),
   // game-5 intentionally has no guess — tests notGuessed on upcoming
 ];
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+
+final List<LeaderboardEntry> kFakeLeaderboard = [
+  const LeaderboardEntry(rank: 1, userId: 'user-1', displayName: 'John Smith', totalPoints: 10),
+  const LeaderboardEntry(rank: 2, userId: 'user-2', displayName: 'Alice Brown', totalPoints: 8),
+  const LeaderboardEntry(rank: 3, userId: 'user-3', displayName: 'Bob Jones', totalPoints: 7),
+  const LeaderboardEntry(rank: 4, userId: 'user-4', displayName: 'Sarah Lee', totalPoints: 6),
+  const LeaderboardEntry(rank: 5, userId: 'user-5', displayName: 'Mike Chen', totalPoints: 5),
+  const LeaderboardEntry(rank: 6, userId: 'user-6', displayName: 'Emma Davis', totalPoints: 4),
+  const LeaderboardEntry(rank: 7, userId: 'user-7', displayName: 'James Wilson', totalPoints: 4),
+  const LeaderboardEntry(rank: 8, userId: 'user-8', displayName: 'Olivia Taylor', totalPoints: 3),
+  const LeaderboardEntry(rank: 9, userId: 'user-9', displayName: 'Liam Martin', totalPoints: 2),
+  const LeaderboardEntry(rank: 10, userId: 'user-10', displayName: 'Sophia White', totalPoints: 1),
+];
+
+/// Current user's entry when outside the top 10.
+final LeaderboardEntry kFakeCurrentUserEntry = LeaderboardEntry(
+  rank: 14,
+  userId: kFakeUser.id,
+  displayName: kFakeUser.displayName,
+  totalPoints: 0,
+);

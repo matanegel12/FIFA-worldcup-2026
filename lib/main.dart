@@ -14,6 +14,9 @@ void main() async {
   for (final Guess guess in kFakeGuesses) {
     MockStore.instance.saveGuess(guess);
   }
+  // Seed all entries including the current user's rank-14 entry so
+  // fetchUserEntry() can find them outside the top 10.
+  MockStore.instance.seedLeaderboard([...kFakeLeaderboard, kFakeCurrentUserEntry]);
 
   // TODO: restore for production — fetches real games from openfootball API
   // try {

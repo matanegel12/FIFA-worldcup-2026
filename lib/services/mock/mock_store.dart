@@ -1,5 +1,6 @@
 import '../../models/game.dart';
 import '../../models/guess.dart';
+import '../../models/leaderboard_entry.dart';
 import '../../models/user.dart';
 
 /// In-memory store used by mock repositories and the admin panel.
@@ -16,6 +17,7 @@ class MockStore {
   List<Game> _games = [];
   List<User> _users = [];
   final Map<String, Guess> _guesses = {}; // key: Guess.compoundId(userId, gameId)
+  List<LeaderboardEntry> _leaderboard = [];
   String? currentUserId; // set on mock sign-in, cleared on sign-out
 
   // ── Games ────────────────────────────────────────────────────────────────────
@@ -98,6 +100,15 @@ class MockStore {
 
   void seedUsers(List<User> users) => _users = List.of(users);
 
+  // ── Leaderboard ───────────────────────────────────────────────────────────────
+
+  /// Pre-built leaderboard entries. When seeded, repositories use this list
+  /// directly instead of computing rankings from [users].
+  List<LeaderboardEntry> get leaderboard => List.unmodifiable(_leaderboard);
+
+  void seedLeaderboard(List<LeaderboardEntry> entries) =>
+      _leaderboard = List.of(entries);
+
   // ── Reset operations ─────────────────────────────────────────────────────────
 
   /// Clears all data. After a full reset the app re-syncs games from the API.
@@ -105,6 +116,7 @@ class MockStore {
     _games.clear();
     _guesses.clear();
     _users.clear();
+    _leaderboard.clear();
     currentUserId = null;
   }
 
