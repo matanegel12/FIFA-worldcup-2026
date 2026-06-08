@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app_theme.dart';
 import '../../../models/prediction_summary.dart';
 
 class PredictionGameCard extends StatelessWidget {
@@ -20,7 +21,7 @@ class PredictionGameCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppTheme.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -44,19 +45,19 @@ class PredictionGameCard extends StatelessWidget {
       case PredictionResult.correct:
         return Text(
           'Result: ✅ ${summary.resultDisplayText}',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF66BB6A)),
+          style: const TextStyle(fontSize: 12, color: AppTheme.correct),
         );
       case PredictionResult.incorrect:
         return Text(
           'Result: ❌ ${summary.resultDisplayText}',
-          style: const TextStyle(fontSize: 12, color: Color(0xFFFF7043)),
+          style: const TextStyle(fontSize: 12, color: AppTheme.incorrect),
         );
       case PredictionResult.pending:
         return const Text(
           'Result: Will appear at the end of the game',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white60,
+            color: AppTheme.textSecondary,
             fontStyle: FontStyle.italic,
           ),
         );
@@ -65,7 +66,7 @@ class PredictionGameCard extends StatelessWidget {
           '⚠️ No prediction yet',
           style: TextStyle(
             fontSize: 12,
-            color: Color(0xFFFFD600),
+            color: AppTheme.secondary,
             fontStyle: FontStyle.italic,
           ),
         );
@@ -78,10 +79,10 @@ class PredictionGameCard extends StatelessWidget {
     if (summary.guess == null) {
       return const TextStyle(
         fontSize: 12,
-        color: Color(0xFFFFD600),
+        color: AppTheme.secondary,
         fontStyle: FontStyle.italic,
       );
     }
-    return const TextStyle(fontSize: 12, color: Colors.white);
+    return const TextStyle(fontSize: 12, color: AppTheme.textPrimary);
   }
 }

@@ -13,6 +13,10 @@ class AppTheme {
   static const Color surface = Color(0xFFF2F2F7);          // light grey background
   static const Color cardColor = Colors.white;             // white cards
   static const Color lockedBannerBg = Color(0xFFFFECB3);   // light amber yellow
+  static const Color textPrimary = Color(0xFF212121);      // near black — main text
+  static const Color textSecondary = Color(0xFF757575);    // medium grey — secondary text
+  static const Color correct = Color(0xFF66BB6A);          // green — correct prediction
+  static const Color incorrect = Color(0xFFFF7043);        // deep orange — incorrect prediction
 
   /// Alias for [surface] — use when setting page background colors.
   static const Color backgroundColor = surface;
