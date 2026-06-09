@@ -60,14 +60,11 @@ class FirestoreAuthRepository implements AuthRepository {
 
   @override
   Future<User?> getCurrentUser() async {
-    print('[AuthRepo] getCurrentUser called');
     final fb.User? fbUser = _auth.currentUser;
-    print('[AuthRepo] Firebase Auth currentUser: ${fbUser?.uid}');
     if (fbUser == null) return null;
     try {
       return await _fetchUser(fbUser.uid);
     } catch (e) {
-      print('[AuthRepo] _fetchUser error: $e');
       rethrow;
     }
   }
