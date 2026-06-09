@@ -1,9 +1,13 @@
+import 'package:mvvm_remepy/observer/observer.dart';
 import 'package:mvvm_remepy/view_model.dart';
 
 import '../../models/game.dart';
 import '../../models/guess.dart';
 import '../../models/round_group.dart';
+import '../../models/user.dart';
 import '../../services/matchday_service.dart';
+import '../../services/repositories/auth_repository/auth_repository.dart';
+import '../../services/repositories/auth_repository/mock_auth_repository.dart';
 import '../../services/repositories/games_repository/games_repository.dart';
 import '../../services/repositories/guesses_repository/guesses_repository.dart';
 import 'upcoming_games_model.dart';
@@ -11,15 +15,21 @@ import 'upcoming_games_model.dart';
 class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
   final GamesRepository _gamesRepository;
   final GuessesRepository _guessesRepository;
+  final AuthRepository _authRepository;
   final String _userId;
+
+  /// Prevents the popup from being shown more than once per session.
+  bool _hasShownPopup = false;
 
   UpcomingGamesViewModel({
     required GamesRepository gamesRepository,
     required GuessesRepository guessesRepository,
     required String userId,
+    AuthRepository? authRepository,
   })  : _gamesRepository = gamesRepository,
         _guessesRepository = guessesRepository,
         _userId = userId,
+        _authRepository = authRepository ?? MockAuthRepository(),
         super(model: UpcomingGamesModel());
 
   /// Called by BasePage after the first frame renders.
@@ -28,7 +38,7 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
     loadGames();
   }
 
-  /// Fetches upcoming games (kickoff in the future) and the user's existing guesses.
+  /// Fetches upcoming games and the user's existing guesses.
   /// Also used as a retry callback from the page.
   Future<void> loadGames() async {
     model.isLoading = true;
@@ -46,6 +56,11 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
       model.guesses = {
         for (final Guess g in userGuesses) g.gameId: g,
       };
+
+      // Check for unseen results only once per session.
+      if (!_hasShownPopup) {
+        await _checkUnseenResults();
+      }
     } catch (e) {
       model.errorMessage = 'Could not load games. Tap to retry.';
     } finally {
@@ -54,8 +69,7 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
     }
   }
 
-  /// Saves a prediction for a game and immediately updates the model
-  /// so the page rebuilds with the new selection visible.
+  /// Saves a prediction for a game and immediately updates the model.
   Future<void> onPredictionChanged(
       String gameId, Prediction prediction) async {
     final Guess newGuess = Guess(
@@ -71,6 +85,44 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
     } catch (e) {
       // Silently fail — the card stays in its previous visual state.
     }
+  }
+
+  /// Called when the user dismisses the new-results popup.
+  Future<void> onPopupDismissed() async {
+    model.showResultsPopup = false;
+    model.unseenGames = []; // clear stale data
+    // Empty routeName triggers Navigator.pop via BasePage.onNavigate.
+    notifyNavigate(NavigateModel(routeName: ''));
+    await _updateLastVisitedAt();
+  }
+
+  // ── Private helpers ───────────────────────────────────────────────────────
+
+  Future<void> _checkUnseenResults() async {
+    final User? user = await _authRepository.getCurrentUser();
+    if (user == null) return;
+
+    final List<Game> allFinished =
+        await _gamesRepository.fetchFinishedGames();
+
+    final List<Game> unseen = user.lastVisitedAt == null
+        ? [] // first-time user — show nothing
+        : allFinished
+            .where((Game g) =>
+                g.finishedAt != null &&
+                g.finishedAt!.isAfter(user.lastVisitedAt!))
+            .toList();
+
+    if (unseen.isEmpty) return;
+
+    _hasShownPopup = true;
+    model.unseenGames = unseen;
+    model.showResultsPopup = true;
+    notify();
+  }
+
+  Future<void> _updateLastVisitedAt() async {
+    await _authRepository.updateLastVisited(_userId, DateTime.now().toUtc());
   }
 
   List<RoundGroup> _buildGroupedGames(List<Game> futureGames) {

@@ -14,7 +14,7 @@ final User kFakeUser = User(
   displayName: 'Test User',
   totalPoints: 0,
   scoreReachedAt: null,
-  lastVisitedAt: null,
+  lastVisitedAt: DateTime.utc(2026, 6, 8, 0, 0), // June 8 — before all finished games
 );
 
 // ── Teams ─────────────────────────────────────────────────────────────────────
@@ -36,39 +36,39 @@ final Game kFinishedGame1 = Game(
   id: 'game-1',
   homeTeam: kTeamMexico,
   awayTeam: kTeamSouthAfrica,
-  kickoffTime: DateTime.utc(2026, 6, 11, 19, 0),
+  kickoffTime: DateTime.utc(2026, 6, 9, 17, 0),
   round: 'Matchday 1',
   ground: 'Mexico City',
   homeScore: 2,
   awayScore: 1,
   status: GameStatus.finished,
-  finishedAt: DateTime.utc(2026, 6, 11, 21, 0),
+  finishedAt: DateTime.utc(2026, 6, 9, 19, 0), // June 9 — after lastVisitedAt ✅
 );
 
 final Game kFinishedGame2 = Game(
   id: 'game-2',
   homeTeam: kTeamBrazil,
   awayTeam: kTeamArgentina,
-  kickoffTime: DateTime.utc(2026, 6, 12, 16, 0),
+  kickoffTime: DateTime.utc(2026, 6, 9, 20, 0),
   round: 'Matchday 2',
   ground: 'New York',
   homeScore: 1,
   awayScore: 1,
   status: GameStatus.finished,
-  finishedAt: DateTime.utc(2026, 6, 12, 18, 0),
+  finishedAt: DateTime.utc(2026, 6, 9, 22, 0), // June 9 — after lastVisitedAt ✅
 );
 
 final Game kFinishedGame3 = Game(
   id: 'game-3',
   homeTeam: kTeamEngland,
   awayTeam: kTeamFrance,
-  kickoffTime: DateTime.utc(2026, 6, 13, 20, 0),
+  kickoffTime: DateTime.utc(2026, 6, 9, 14, 0),
   round: 'Matchday 3',
   ground: 'Los Angeles',
   homeScore: 3,
   awayScore: 0,
   status: GameStatus.finished,
-  finishedAt: DateTime.utc(2026, 6, 13, 22, 0),
+  finishedAt: DateTime.utc(2026, 6, 9, 16, 0), // June 9 — after lastVisitedAt ✅
 );
 
 // ── Upcoming games ────────────────────────────────────────────────────────────

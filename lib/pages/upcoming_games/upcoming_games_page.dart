@@ -9,6 +9,7 @@ import '../../widgets/shared/page_error_view.dart';
 import '../../widgets/shared/spinning_ball.dart';
 import 'upcoming_games_model.dart';
 import 'upcoming_games_vm.dart';
+import 'widgets/new_results_dialog.dart';
 import 'widgets/upcoming_game_card.dart';
 
 class UpcomingGamesPage extends BasePage<UpcomingGamesModel, UpcomingGamesViewModel> {
@@ -21,6 +22,39 @@ class UpcomingGamesPage extends BasePage<UpcomingGamesModel, UpcomingGamesViewMo
 
 class _UpcomingGamesPageState
     extends BasePageState<UpcomingGamesModel, UpcomingGamesViewModel, UpcomingGamesPage> {
+  @override
+  void onNotify([UpcomingGamesModel? data]) {
+    super.onNotify(data);
+    if (model.showResultsPopup) {
+      model.showResultsPopup = false; // reset immediately before showing
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showResultsDialog();
+      });
+    }
+  }
+
+  Future<void> _showResultsDialog() async {
+    // Precache all flag images in parallel before opening the dialog.
+    final List<Future<void>> precacheFutures = [
+      for (final Game game in model.unseenGames) ...[
+        precacheImage(NetworkImage(game.homeTeam.flagUrl), context),
+        precacheImage(NetworkImage(game.awayTeam.flagUrl), context),
+      ]
+    ];
+    await Future.wait(precacheFutures, eagerError: false);
+
+    if (!mounted) return;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => NewResultsDialog(
+        unseenGames: model.unseenGames,
+        onDismissed: () => viewModel.onPopupDismissed(),
+      ),
+    );
+  }
+
   @override
   Color get backgroundColor => Theme.of(context).colorScheme.surface;
 
