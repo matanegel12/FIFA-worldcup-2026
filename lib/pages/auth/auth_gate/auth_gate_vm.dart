@@ -17,10 +17,8 @@ class AuthGateViewModel extends ViewModel<AuthGateModel> {
   }
 
   Future<void> _checkSession() async {
-    print('[AuthGate] _checkSession called');
     try {
       final user = await _authRepository.getCurrentUser();
-      print('[AuthGate] getCurrentUser returned: ${user?.id}');
       if (user != null) {
         await _authRepository.updateLastVisited(
             user.id, DateTime.now().toUtc());
@@ -30,12 +28,9 @@ class AuthGateViewModel extends ViewModel<AuthGateModel> {
           arguments: {'userId': user.id, 'email': user.email},
         ));
       } else {
-        print('[AuthGate] no user — navigating to sign-in');
         notifyNavigate(NavigateModel(routeName: '/sign-in', replace: true));
       }
     } catch (e) {
-      print('[AuthGate] ERROR: $e');
-      print('[AuthGate] ERROR type: ${e.runtimeType}');
       if (e.toString().contains('User document not found')) {
         // Auth session exists but Firestore document was deleted — go to sign-in.
         notifyNavigate(NavigateModel(routeName: '/sign-in', replace: true));
