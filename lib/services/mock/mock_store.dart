@@ -109,6 +109,34 @@ class MockStore {
   void seedLeaderboard(List<LeaderboardEntry> entries) =>
       _leaderboard = List.of(entries);
 
+  /// Updates a user's points in the seeded leaderboard, then re-sorts and
+  /// re-ranks so the page reflects the change immediately.
+  /// No-op if the userId is not in the seeded leaderboard.
+  void updateLeaderboardPoints(String userId, int totalPoints) {
+    final int index =
+        _leaderboard.indexWhere((LeaderboardEntry e) => e.userId == userId);
+    if (index == -1) return;
+
+    _leaderboard[index] = LeaderboardEntry(
+      rank: _leaderboard[index].rank,
+      userId: _leaderboard[index].userId,
+      displayName: _leaderboard[index].displayName,
+      totalPoints: totalPoints,
+    );
+
+    // Re-sort by points descending, then re-assign ranks 1…n.
+    _leaderboard.sort((LeaderboardEntry a, LeaderboardEntry b) =>
+        b.totalPoints.compareTo(a.totalPoints));
+    for (int i = 0; i < _leaderboard.length; i++) {
+      _leaderboard[i] = LeaderboardEntry(
+        rank: i + 1,
+        userId: _leaderboard[i].userId,
+        displayName: _leaderboard[i].displayName,
+        totalPoints: _leaderboard[i].totalPoints,
+      );
+    }
+  }
+
   // ── Reset operations ─────────────────────────────────────────────────────────
 
   /// Clears all data. After a full reset the app re-syncs games from the API.

@@ -22,7 +22,11 @@ class AuthGateViewModel extends ViewModel<AuthGateModel> {
     try {
       final user = await _authRepository.getCurrentUser();
       if (user != null) {
-        notifyNavigate(NavigateModel(routeName: '/home', replace: true));
+        notifyNavigate(NavigateModel(
+          routeName: '/home',
+          replace: true,
+          arguments: {'userId': user.id, 'email': user.email},
+        ));
       } else {
         notifyNavigate(NavigateModel(routeName: '/sign-in', replace: true));
       }

@@ -9,7 +9,6 @@ MainShellViewModel _makeVm() => MainShellViewModel(
       gamesRepository: MockGamesRepository(),
       guessesRepository: MockGuessesRepository(),
       leaderboardRepository: MockLeaderboardRepository(),
-      userId: 'test-uid-123',
     );
 
 void main() {
@@ -22,6 +21,44 @@ void main() {
 
     test('isLoading starts false', () {
       expect(_makeVm().model.isLoading, isFalse);
+    });
+
+    test('userId starts empty', () {
+      expect(_makeVm().model.userId, '');
+    });
+
+    test('userEmail starts empty', () {
+      expect(_makeVm().model.userEmail, '');
+    });
+  });
+
+  group('onViewLoaded — sets userId and userEmail from route arguments', () {
+    test('sets model.userId and model.userEmail from a Map', () {
+      final MainShellViewModel vm = _makeVm();
+      vm.onViewLoaded({'userId': 'uid-abc', 'email': 'user@example.com'});
+      expect(vm.model.userId, 'uid-abc');
+      expect(vm.model.userEmail, 'user@example.com');
+    });
+
+    test('leaves model values empty when data is null', () {
+      final MainShellViewModel vm = _makeVm();
+      vm.onViewLoaded(null);
+      expect(vm.model.userId, '');
+      expect(vm.model.userEmail, '');
+    });
+
+    test('leaves model values empty when data is not a Map', () {
+      final MainShellViewModel vm = _makeVm();
+      vm.onViewLoaded('just-a-string');
+      expect(vm.model.userId, '');
+      expect(vm.model.userEmail, '');
+    });
+
+    test('handles missing keys gracefully', () {
+      final MainShellViewModel vm = _makeVm();
+      vm.onViewLoaded(<String, String>{});
+      expect(vm.model.userId, '');
+      expect(vm.model.userEmail, '');
     });
   });
 
@@ -55,28 +92,24 @@ void main() {
     test('onTabChanged(-1) does not change currentIndex', () {
       final MainShellViewModel vm = _makeVm();
       vm.onTabChanged(-1);
-      expect(vm.model.currentIndex, 0); // unchanged from initial
+      expect(vm.model.currentIndex, 0);
     });
 
     test('onTabChanged(4) does not change currentIndex', () {
       final MainShellViewModel vm = _makeVm();
       vm.onTabChanged(4);
-      expect(vm.model.currentIndex, 0); // unchanged from initial
+      expect(vm.model.currentIndex, 0);
     });
 
     test('out-of-range call does not reset a previously set index', () {
       final MainShellViewModel vm = _makeVm();
       vm.onTabChanged(2);
       vm.onTabChanged(99);
-      expect(vm.model.currentIndex, 2); // still 2, not reset
+      expect(vm.model.currentIndex, 2);
     });
   });
 
-  group('repositories and userId exposed', () {
-    test('userId is accessible', () {
-      expect(_makeVm().userId, 'test-uid-123');
-    });
-
+  group('repositories exposed', () {
     test('gamesRepository is accessible', () {
       expect(_makeVm().gamesRepository, isNotNull);
     });
