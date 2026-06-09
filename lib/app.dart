@@ -13,15 +13,23 @@ import 'pages/auth/sign_up/sign_up_vm.dart';
 import 'pages/main_shell/main_shell_page.dart';
 import 'pages/main_shell/main_shell_vm.dart';
 import 'services/repositories/auth_repository/auth_repository.dart';
-import 'services/repositories/auth_repository/mock_auth_repository.dart';
-import 'services/repositories/games_repository/mock_games_repository.dart';
-import 'services/repositories/guesses_repository/mock_guesses_repository.dart';
-import 'services/repositories/leaderboard_repository/mock_leaderboard_repository.dart';
+import 'services/repositories/auth_repository/firestore_auth_repository.dart';
+import 'services/repositories/games_repository/firestore_games_repository.dart';
+import 'services/repositories/games_repository/games_repository.dart';
+import 'services/repositories/guesses_repository/firestore_guesses_repository.dart';
+import 'services/repositories/guesses_repository/guesses_repository.dart';
+import 'services/repositories/leaderboard_repository/firestore_leaderboard_repository.dart';
+import 'services/repositories/leaderboard_repository/leaderboard_repository.dart';
+import 'services/sync/game_sync_service.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
-  static final AuthRepository authRepository = MockAuthRepository();
+  static final AuthRepository authRepository = FirestoreAuthRepository();
+  static final GamesRepository gamesRepository = FirestoreGamesRepository();
+  static final GuessesRepository guessesRepository = FirestoreGuessesRepository();
+  static final LeaderboardRepository leaderboardRepository = FirestoreLeaderboardRepository();
+  static final GameSyncService gameSyncService = GameSyncService();
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +59,10 @@ class App extends StatelessWidget {
             ),
         '/home': (_) => MainShellPage(
               viewModel: MainShellViewModel(
-                gamesRepository: MockGamesRepository(),
-                guessesRepository: MockGuessesRepository(),
-                leaderboardRepository: MockLeaderboardRepository(),
+                gamesRepository: gamesRepository,
+                guessesRepository: guessesRepository,
+                leaderboardRepository: leaderboardRepository,
+                gameSyncService: gameSyncService,
               ),
             ),
         '/admin': (_) => AdminPanelPage(

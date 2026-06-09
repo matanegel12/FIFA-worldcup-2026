@@ -56,7 +56,11 @@ class Game {
         kickoffTime: DateTime.parse(json['kickoffTime'] as String).toUtc(),
         homeScore: json['homeScore'] as int?,
         awayScore: json['awayScore'] as int?,
-        status: GameStatus.values.byName(json['status'] as String),
+        // status may be absent on documents written by the sync (schedule-only
+        // merge). Default to upcoming so fromJson never throws on new docs.
+        status: json['status'] != null
+            ? GameStatus.values.byName(json['status'] as String)
+            : GameStatus.upcoming,
         finishedAt: json['finishedAt'] != null
             ? DateTime.parse(json['finishedAt'] as String).toUtc()
             : null,

@@ -14,27 +14,37 @@ class FirestoreGamesRepository implements GamesRepository {
 
   @override
   Future<List<Game>> fetchAllGames() async {
-    final snap = await _col.orderBy('kickoffTime').get();
-    return snap.docs.map((d) => Game.fromJson(d.data())).toList();
+    final QuerySnapshot<Map<String, dynamic>> snap =
+        await _col.orderBy('kickoffTime').get();
+    return snap.docs
+        .map((QueryDocumentSnapshot<Map<String, dynamic>> d) =>
+            Game.fromJson(d.data()))
+        .toList();
   }
 
   @override
   Future<List<Game>> fetchUpcomingGames() async {
-    final snap = await _col
+    final QuerySnapshot<Map<String, dynamic>> snap = await _col
         .where('kickoffTime',
             isGreaterThan: DateTime.now().toUtc().toIso8601String())
         .orderBy('kickoffTime')
         .get();
-    return snap.docs.map((d) => Game.fromJson(d.data())).toList();
+    return snap.docs
+        .map((QueryDocumentSnapshot<Map<String, dynamic>> d) =>
+            Game.fromJson(d.data()))
+        .toList();
   }
 
   @override
   Future<List<Game>> fetchFinishedGames() async {
-    final snap = await _col
+    final QuerySnapshot<Map<String, dynamic>> snap = await _col
         .where('status', isEqualTo: GameStatus.finished.name)
         .orderBy('kickoffTime')
         .get();
-    return snap.docs.map((d) => Game.fromJson(d.data())).toList();
+    return snap.docs
+        .map((QueryDocumentSnapshot<Map<String, dynamic>> d) =>
+            Game.fromJson(d.data()))
+        .toList();
   }
 
   @override

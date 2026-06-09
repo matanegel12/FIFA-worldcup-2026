@@ -18,7 +18,6 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
   final AuthRepository _authRepository;
   final String _userId;
 
-  /// Prevents the popup from being shown more than once per session.
   bool _hasShownPopup = false;
 
   UpcomingGamesViewModel({
@@ -32,14 +31,11 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
         _authRepository = authRepository ?? MockAuthRepository(),
         super(model: UpcomingGamesModel());
 
-  /// Called by BasePage after the first frame renders.
   @override
   void onViewLoaded(dynamic data) {
     loadGames();
   }
 
-  /// Fetches upcoming games and the user's existing guesses.
-  /// Also used as a retry callback from the page.
   Future<void> loadGames() async {
     model.isLoading = true;
     model.errorMessage = null;
@@ -57,7 +53,6 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
         for (final Guess g in userGuesses) g.gameId: g,
       };
 
-      // Check for unseen results only once per session.
       if (!_hasShownPopup) {
         await _checkUnseenResults();
       }
@@ -69,7 +64,6 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
     }
   }
 
-  /// Saves a prediction for a game and immediately updates the model.
   Future<void> onPredictionChanged(
       String gameId, Prediction prediction) async {
     final Guess newGuess = Guess(
@@ -87,11 +81,9 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
     }
   }
 
-  /// Called when the user dismisses the new-results popup.
   Future<void> onPopupDismissed() async {
     model.showResultsPopup = false;
-    model.unseenGames = []; // clear stale data
-    // Empty routeName triggers Navigator.pop via BasePage.onNavigate.
+    model.unseenGames = [];
     notifyNavigate(NavigateModel(routeName: ''));
     await _updateLastVisitedAt();
   }
@@ -106,7 +98,7 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
         await _gamesRepository.fetchFinishedGames();
 
     final List<Game> unseen = user.lastVisitedAt == null
-        ? [] // first-time user — show nothing
+        ? []
         : allFinished
             .where((Game g) =>
                 g.finishedAt != null &&
