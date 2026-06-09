@@ -6,6 +6,7 @@ import '../../models/game.dart';
 import '../../models/round_group.dart';
 import '../../widgets/shared/page_empty_view.dart';
 import '../../widgets/shared/page_error_view.dart';
+import '../../widgets/shared/spinning_ball.dart';
 import 'upcoming_games_model.dart';
 import 'upcoming_games_vm.dart';
 import 'widgets/upcoming_game_card.dart';
@@ -19,25 +20,7 @@ class UpcomingGamesPage extends BasePage<UpcomingGamesModel, UpcomingGamesViewMo
 }
 
 class _UpcomingGamesPageState
-    extends BasePageState<UpcomingGamesModel, UpcomingGamesViewModel, UpcomingGamesPage>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
+    extends BasePageState<UpcomingGamesModel, UpcomingGamesViewModel, UpcomingGamesPage> {
   @override
   Color get backgroundColor => Theme.of(context).colorScheme.surface;
 
@@ -48,28 +31,16 @@ class _UpcomingGamesPageState
 
   @override
   Widget get body {
-    if (model.isLoading) return _buildSkeleton();
+    if (model.isLoading) return _buildLoading();
     if (model.errorMessage != null) return _buildError();
     if (model.groupedGames.isEmpty) return _buildEmpty();
     return _buildGameList();
   }
 
-  // ── Loading — skeleton screen ─────────────────────────────────────────────
+  // ── Loading ───────────────────────────────────────────────────────────────
 
-  Widget _buildSkeleton() {
-    return FadeTransition(
-      opacity: Tween<double>(begin: 0.4, end: 1.0).animate(_pulseController),
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          _SkeletonCard(),
-          SizedBox(height: 12),
-          _SkeletonCard(),
-          SizedBox(height: 12),
-          _SkeletonCard(),
-        ],
-      ),
-    );
+  Widget _buildLoading() {
+    return const Center(child: SpinningBall());
   }
 
   // ── Error state ───────────────────────────────────────────────────────────
@@ -158,57 +129,3 @@ class _UpcomingGamesPageState
     return '${months[dt.month - 1]} ${dt.day}';
   }
 }
-
-// ── Skeleton card ─────────────────────────────────────────────────────────────
-
-class _SkeletonCard extends StatelessWidget {
-  const _SkeletonCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _grey(width: 48, height: 48, radius: 8),
-                _grey(width: 80, height: 14),
-                Row(
-                  children: [
-                    _grey(width: 52, height: 32, radius: 6),
-                    const SizedBox(width: 6),
-                    _grey(width: 52, height: 32, radius: 6),
-                    const SizedBox(width: 6),
-                    _grey(width: 52, height: 32, radius: 6),
-                  ],
-                ),
-                _grey(width: 80, height: 14),
-                _grey(width: 48, height: 48, radius: 8),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _grey(width: double.infinity, height: 12),
-            const SizedBox(height: 8),
-            _grey(width: 160, height: 12),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _grey({required double width, required double height, double radius = 4}) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
-  }
-}
-
