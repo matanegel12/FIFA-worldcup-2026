@@ -1,6 +1,7 @@
 import 'package:mvvm_remepy/observer/observer.dart';
 import 'package:mvvm_remepy/view_model.dart';
 
+import '../../../models/user.dart';
 import '../../../services/repositories/auth_repository/auth_repository.dart';
 import 'sign_up_model.dart';
 
@@ -17,12 +18,16 @@ class SignUpViewModel extends ViewModel<SignUpModel> {
     notify();
 
     try {
-      await _authRepository.signUp(
+      final User user = await _authRepository.signUp(
         email: email,
         password: password,
         displayName: displayName,
       );
-      notifyNavigate(NavigateModel(routeName: '/home', replace: true));
+      notifyNavigate(NavigateModel(
+        routeName: '/home',
+        replace: true,
+        arguments: {'userId': user.id, 'email': user.email},
+      ));
     } catch (e) {
       model.errorMessage = _friendlyError(e);
     } finally {
@@ -36,11 +41,14 @@ class SignUpViewModel extends ViewModel<SignUpModel> {
   }
 
   String _friendlyError(Object e) {
-    final message = e.toString().toLowerCase();
-    if (message.contains('email-already-in-use') || message.contains('already in use')) {
+    final String message = e.toString().toLowerCase();
+    if (message.contains('email-already-in-use') ||
+        message.contains('already in use')) {
       return 'An account with this email already exists.';
     }
-    if (message.contains('weak-password')) return 'Password must be at least 6 characters.';
+    if (message.contains('weak-password')) {
+      return 'Password must be at least 6 characters.';
+    }
     if (message.contains('network')) return 'Check your internet connection.';
     return 'Something went wrong. Please try again.';
   }

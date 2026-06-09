@@ -1,6 +1,7 @@
 import 'package:mvvm_remepy/observer/observer.dart';
 import 'package:mvvm_remepy/view_model.dart';
 
+import '../../../models/user.dart';
 import '../../../services/repositories/auth_repository/auth_repository.dart';
 import 'sign_in_model.dart';
 
@@ -17,8 +18,13 @@ class SignInViewModel extends ViewModel<SignInModel> {
     notify();
 
     try {
-      await _authRepository.signIn(email: email, password: password);
-      notifyNavigate(NavigateModel(routeName: '/home', replace: true));
+      final User user = await _authRepository.signIn(
+          email: email, password: password);
+      notifyNavigate(NavigateModel(
+        routeName: '/home',
+        replace: true,
+        arguments: {'userId': user.id, 'email': user.email},
+      ));
     } catch (e) {
       model.errorMessage = _friendlyError(e);
     } finally {
@@ -32,8 +38,10 @@ class SignInViewModel extends ViewModel<SignInModel> {
   }
 
   String _friendlyError(Object e) {
-    final message = e.toString().toLowerCase();
-    if (message.contains('user-not-found') || message.contains('wrong-password') || message.contains('invalid-credential')) {
+    final String message = e.toString().toLowerCase();
+    if (message.contains('user-not-found') ||
+        message.contains('wrong-password') ||
+        message.contains('invalid-credential')) {
       return 'Incorrect email or password.';
     }
     if (message.contains('network')) return 'Check your internet connection.';
