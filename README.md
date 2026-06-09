@@ -1,60 +1,69 @@
-# World Cup 2026 Predictions
+# FIFA World Cup 2026 Predictions
 
-A Flutter app for predicting FIFA World Cup 2026 match outcomes. Runs on Android, iOS, and Web from a single codebase.
+A Flutter app where users predict match outcomes for the FIFA World Cup 2026. Built with Flutter + Firebase, runs on Android, iOS, and Web from a single codebase.
+
+## What it does
+
+- **Sign up / Sign in** with email and password (Firebase Authentication)
+- **Upcoming Games** — browse all 72 WC2026 fixtures grouped by matchday. Tap to predict: Team A wins, Team B wins, or Draw. Predictions lock at kickoff.
+- **Results** — see finished games with final scores and outcomes
+- **Predictions** — review all your guesses with correct ✅ / incorrect ❌ indicators
+- **Leaderboard** — top 10 users ranked by points. Your rank is pinned at the bottom if you are outside the top 10.
+- **Scoring** — +1 point per correct prediction. +2 bonus if you correctly predicted every game on the same calendar day.
+- **New results popup** — on login, a dialog shows any finished games you have not seen yet.
+- **Admin panel** — hidden screen for the admin account to enter final scores. Scoring and leaderboard update automatically.
+
+---
 
 ## Prerequisites
 
 - Flutter SDK (see `pubspec.yaml` for minimum SDK version)
-- A Firebase project with Authentication and Firestore enabled
-- `flutterfire_cli` installed: `dart pub global activate flutterfire_cli`
+- A Firebase project with **Authentication** (Email/Password) and **Firestore** enabled
+- `flutterfire_cli` installed:
 
-> Firebase setup is required before the app will run. See the Firebase section below.
+```bash
+dart pub global activate flutterfire_cli
+```
+
+- The `mvvm_remepy` package must be present at `../frontend-v2/packages/mvvm_remepy` (local path dependency)
+
+---
 
 ## Firebase Setup
 
-Run this once after cloning to connect the app to your Firebase project:
+Run once after cloning to generate `lib/firebase_options.dart`:
 
 ```bash
 flutterfire configure
-``` 
+```
 
-This generates `lib/firebase_options.dart` which is not committed to the repo.
+Then create one Firestore composite index (required for the Results page):
+
+- **Collection:** `games`
+- **Fields:** `status` Ascending, `kickoffTime` Ascending
+- **Scope:** Collection
+
+> Firebase Console → Firestore Database → Indexes → Add Index
+
+---
 
 ## Running the App
 
-### Web
-
 ```bash
-flutter run -d chrome
-```
-
-### Android
-
-Connect a device or start an emulator, then:
-
-```bash
+# Android
 flutter run -d android
-```
 
-### iOS
-
-```bash
+# iOS
 flutter run -d ios
-```
 
-### All available devices
+# Web
+flutter run -d chrome
 
-To see all connected devices and emulators:
-
-```bash
+# List all available devices
 flutter devices
 ```
 
-Then run on a specific device by ID:
-
-```bash
-flutter run -d <device-id>
-```
+---
 
 ## Running Tests
 
@@ -62,18 +71,15 @@ flutter run -d <device-id>
 flutter test
 ```
 
+---
+
 ## Admin Panel
 
-The admin panel is hidden and accessible only to the admin account (`matan.egel@remepy.com`). Once signed in with that account, the admin panel option will appear in the navigation.
+The admin panel is visible only when signed in with the admin account (`test@test.com` in development). A floating action button (⚙️) appears in the bottom-right corner of the main screen.
 
-The admin panel lets you:
-- Inject mock results for upcoming games
-- Reset specific days, guesses, or users
-- Seed fake users for leaderboard testing
+The admin panel shows all games where kickoff has passed but no score has been recorded yet. Enter the final score and tap **Save** — the scoring engine runs automatically, user points update, and the leaderboard refreshes.
 
-## Architecture
-
-This app uses the company MVVM architecture via the `mvvm_remepy` package. See `CLAUDE.md` for a full breakdown of the architecture, folder structure, and development rules.
+---
 
 ## Design Decisions
 
@@ -82,7 +88,15 @@ This app uses the company MVVM architecture via the `mvvm_remepy` package. See `
 | Timezones | All times stored in UTC, displayed in user's local timezone |
 | Guess locking | Locks at kickoff — cannot be changed after |
 | Scope | Group stage only (draws are valid outcomes) |
-| Set bonus (+2) | All games on the same calendar day (UTC) correct |
+| Set bonus (+2) | All games on the same calendar day (UTC) predicted correctly |
 | Leaderboard tiebreaker | Earliest to reach the score wins |
 | Auth | Firebase Authentication (email + password) |
 | Database | Cloud Firestore |
+| Game data | openfootball/worldcup.json — free, no API key, syncs once per 24 hours |
+| Scores | Admin panel only — openfootball data is never used to overwrite scores |
+
+---
+
+## Architecture
+
+This app uses the company MVVM architecture via the `mvvm_remepy` package. See `CLAUDE.md` for a full breakdown of the architecture, folder structure, and development rules.

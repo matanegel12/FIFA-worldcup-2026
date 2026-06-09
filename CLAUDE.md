@@ -189,8 +189,7 @@ lib/
       admin_panel_model.dart
       admin_panel_vm.dart
       widgets/
-        mock_result_form.dart
-        reset_button.dart
+        game_result_form.dart
 
   widgets/
     shared/
@@ -225,10 +224,10 @@ test/                             # Mirrors lib/ structure
 - Every game row shows the **flags of both teams**.
 
 ### Data Source
-- **Primary (recommended):** `openfootball/worldcup.json` — free, no key, public-domain JSON with the full 2026 schedule.
-- **Alternative:** API-Football (`api-football.com`, `league=1&season=2026`) — live data, requires free API key.
-- Wrap whichever is chosen behind a repository interface so the data source can be swapped (real ↔ mock) without touching ViewModels.
-- For flags: map FIFA/ISO country codes to `flagcdn.com` or bundle flag assets.
+- **Source:** `openfootball/worldcup.json` — free, no API key, public-domain JSON with the full 2026 schedule.
+- Fetched by `WorldCupApiClient`, synced to Firestore once every 24 hours by `GameSyncService`.
+- Only schedule fields (teams, kickoff time, round, ground) are written to Firestore. Scores are **never** overwritten by the sync — they are managed exclusively by the admin panel.
+- For flags: ISO country codes map to `flagcdn.com` URLs via `Team.flagUrl`.
 
 ### Predictions & Scoring
 - Users guess: **Team A wins**, **Team B wins**, or **Draw**.
@@ -251,10 +250,10 @@ test/                             # Mirrors lib/ structure
 - Implement as a background service or a hook triggered by the admin panel — same code path in testing and production.
 
 ### Admin Panel
-- Hidden panel, visible only to admin email (hardcoded in one `isAdmin` getter).
-- Inject mock results for upcoming games (triggers the same scoring path as production).
-- Reset controls: reset specific days, clear all guesses, clear/seed users, full reset.
-- Seed fake users with guesses for leaderboard testing.
+- Hidden panel, visible only to admin email (hardcoded in `admin_gate.dart → isAdmin()`).
+- Shows games where kickoff has passed but no score has been recorded yet.
+- Admin enters the final score and taps Save — the scoring engine runs automatically for all users, leaderboard updates, and the list reloads.
+- No reset controls — score entry is the only action.
 
 ---
 
@@ -315,7 +314,7 @@ Whenever a business function is created:
 | **Predictions** | Guess locking (cannot change after kickoff), prediction update before kickoff |
 | **Leaderboard** | Ranking order, tiebreaker (earliest score) |
 | **New Results Popup** | Uses `lastVisitedAt` on User + `finishedAt` on Game. Show games where `finishedAt > lastVisitedAt`. Update `lastVisitedAt` on popup dismiss. First-time user (`lastVisitedAt == null`) sees nothing. |
-| **Admin Panel** | Reset operations, mock result injection, scoring triggered correctly |
+| **Admin Panel** | `isAdmin()` returns true only for admin email, false for null |
 
 ---
 
@@ -413,18 +412,18 @@ Requirements:
 
 Create tests immediately.
 
-### Phase 11 — Admin Panel
-**Goal:** Hidden developer/testing tools.
+### Phase 11 — Admin Panel ✅
+**Goal:** Hidden screen for entering final scores.
 
-Build: `AdminPanelPage`.
+Build: `AdminPanelPage`, `admin_gate.dart`.
 
 Requirements:
-- Gated by `isAdmin` getter checking hardcoded admin email.
-- Inject mock results (triggers same scoring path as production).
-- Reset: specific days, all guesses, users, full reset.
-- Seed fake users for leaderboard testing.
+- FAB visible only when `isAdmin(model.userEmail)` is true.
+- Lists games where kickoff has passed and `homeScore == null`.
+- Admin enters score → `recordResult()` → `_rescoreAllUsers()` → leaderboard updates.
+- `isAdmin()` isolated in `lib/services/admin/admin_gate.dart`.
 
-Create tests immediately.
+Tests: `isAdmin()` — returns true only for the hardcoded admin email, false for null.
 
 ### Phase 12 — Cross-Platform Polish
 **Goal:** App works on all three platforms with great UX.
