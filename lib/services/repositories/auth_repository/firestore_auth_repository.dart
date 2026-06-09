@@ -27,13 +27,14 @@ class FirestoreAuthRepository implements AuthRepository {
       email: email,
       password: password,
     );
-    final uid = credential.user!.uid;
+    final String uid = credential.user!.uid;
 
-    final user = User(
+    final User user = User(
       id: uid,
       email: email,
       displayName: displayName,
       totalPoints: 0,
+      lastVisitedAt: DateTime.now().toUtc(),
     );
 
     await _users.doc(uid).set(user.toJson());
@@ -49,7 +50,8 @@ class FirestoreAuthRepository implements AuthRepository {
       email: email,
       password: password,
     );
-    final uid = credential.user!.uid;
+    final String uid = credential.user!.uid;
+    await updateLastVisited(uid, DateTime.now().toUtc());
     return _fetchUser(uid);
   }
 
@@ -58,9 +60,16 @@ class FirestoreAuthRepository implements AuthRepository {
 
   @override
   Future<User?> getCurrentUser() async {
-    final fbUser = _auth.currentUser;
+    print('[AuthRepo] getCurrentUser called');
+    final fb.User? fbUser = _auth.currentUser;
+    print('[AuthRepo] Firebase Auth currentUser: ${fbUser?.uid}');
     if (fbUser == null) return null;
-    return _fetchUser(fbUser.uid);
+    try {
+      return await _fetchUser(fbUser.uid);
+    } catch (e) {
+      print('[AuthRepo] _fetchUser error: $e');
+      rethrow;
+    }
   }
 
   @override
@@ -70,7 +79,13 @@ class FirestoreAuthRepository implements AuthRepository {
       });
 
   Future<User> _fetchUser(String uid) async {
-    final doc = await _users.doc(uid).get();
-    return User.fromJson(uid, doc.data()!);
+    final DocumentSnapshot<Map<String, dynamic>> doc =
+        await _users.doc(uid).get();
+    if (!doc.exists) {
+      // Document deleted — sign out and treat as logged out.
+      await _auth.signOut();
+      throw Exception('User document not found');
+    }
+    return User.fromJson(doc.id, doc.data()!);
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fifa_worldcup_2026_predictions/models/guess.dart';
 
 void main() {
-  const guess = Guess(
+  const Guess guess = Guess(
     userId: 'uid-abc',
     gameId: 'g1',
     prediction: Prediction.teamAWins,
@@ -10,7 +10,7 @@ void main() {
 
   group('Guess.fromJson', () {
     test('creates guess with correct fields', () {
-      final result = Guess.fromJson({
+      final Guess result = Guess.fromJson({
         'userId': 'uid-abc',
         'gameId': 'g1',
         'prediction': 'teamAWins',
@@ -39,7 +39,7 @@ void main() {
 
   group('Guess.toJson', () {
     test('serializes all fields correctly', () {
-      final json = guess.toJson();
+      final Map<String, dynamic> json = guess.toJson();
 
       expect(json['userId'], 'uid-abc');
       expect(json['gameId'], 'g1');
@@ -49,7 +49,7 @@ void main() {
 
   group('round-trip', () {
     test('fromJson(toJson()) returns equal guess', () {
-      final restored = Guess.fromJson(guess.toJson());
+      final Guess restored = Guess.fromJson(guess.toJson());
       expect(restored, guess);
     });
   });
@@ -76,7 +76,7 @@ void main() {
 
   group('equality', () {
     test('same userId and gameId are equal regardless of prediction', () {
-      const other = Guess(
+      const Guess other = Guess(
         userId: 'uid-abc',
         gameId: 'g1',
         prediction: Prediction.teamBWins,
@@ -85,7 +85,7 @@ void main() {
     });
 
     test('different userId are not equal', () {
-      const other = Guess(
+      const Guess other = Guess(
         userId: 'uid-xyz',
         gameId: 'g1',
         prediction: Prediction.teamAWins,
@@ -94,7 +94,7 @@ void main() {
     });
 
     test('different gameId are not equal', () {
-      const other = Guess(
+      const Guess other = Guess(
         userId: 'uid-abc',
         gameId: 'g2',
         prediction: Prediction.teamAWins,

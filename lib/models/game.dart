@@ -14,6 +14,8 @@ class Game {
   final int? awayScore;
   final GameStatus status;
   final DateTime? finishedAt; // UTC — set when result is recorded, used for new results popup
+  final String round; // raw string from the API e.g. "Matchday 1", "Matchday 8"
+  final String ground; // venue name e.g. "Mexico City"
 
   const Game({
     required this.id,
@@ -24,6 +26,8 @@ class Game {
     this.homeScore,
     this.awayScore,
     this.finishedAt,
+    this.round = '',
+    this.ground = '',
   });
 
   bool get isFinished => status == GameStatus.finished;
@@ -52,10 +56,16 @@ class Game {
         kickoffTime: DateTime.parse(json['kickoffTime'] as String).toUtc(),
         homeScore: json['homeScore'] as int?,
         awayScore: json['awayScore'] as int?,
-        status: GameStatus.values.byName(json['status'] as String),
+        // status may be absent on documents written by the sync (schedule-only
+        // merge). Default to upcoming so fromJson never throws on new docs.
+        status: json['status'] != null
+            ? GameStatus.values.byName(json['status'] as String)
+            : GameStatus.upcoming,
         finishedAt: json['finishedAt'] != null
             ? DateTime.parse(json['finishedAt'] as String).toUtc()
             : null,
+        round: (json['round'] as String?) ?? '',
+        ground: (json['ground'] as String?) ?? '',
       );
 
   Map<String, dynamic> toJson() => {
@@ -67,6 +77,8 @@ class Game {
         'awayScore': awayScore,
         'status': status.name,
         'finishedAt': finishedAt?.toIso8601String(),
+        'round': round,
+        'ground': ground,
       };
 
   @override

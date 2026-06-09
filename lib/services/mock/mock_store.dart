@@ -1,5 +1,6 @@
 import '../../models/game.dart';
 import '../../models/guess.dart';
+import '../../models/leaderboard_entry.dart';
 import '../../models/user.dart';
 
 /// In-memory store used by mock repositories and the admin panel.
@@ -16,14 +17,16 @@ class MockStore {
   List<Game> _games = [];
   List<User> _users = [];
   final Map<String, Guess> _guesses = {}; // key: Guess.compoundId(userId, gameId)
+  List<LeaderboardEntry> _leaderboard = [];
   String? currentUserId; // set on mock sign-in, cleared on sign-out
 
   // ── Games ────────────────────────────────────────────────────────────────────
 
   List<Game> get games => List.unmodifiable(_games);
 
-  List<Game> get upcomingGames =>
-      _games.where((g) => !g.isFinished).toList();
+  List<Game> get upcomingGames => _games
+      .where((g) => g.kickoffTime.isAfter(DateTime.now().toUtc()))
+      .toList();
 
   List<Game> get finishedGames =>
       _games.where((g) => g.isFinished).toList();
@@ -54,6 +57,8 @@ class MockStore {
       homeTeam: _games[index].homeTeam,
       awayTeam: _games[index].awayTeam,
       kickoffTime: _games[index].kickoffTime,
+      round: _games[index].round,
+      ground: _games[index].ground,
       homeScore: homeScore,
       awayScore: awayScore,
       status: GameStatus.finished,
@@ -95,6 +100,43 @@ class MockStore {
 
   void seedUsers(List<User> users) => _users = List.of(users);
 
+  // ── Leaderboard ───────────────────────────────────────────────────────────────
+
+  /// Pre-built leaderboard entries. When seeded, repositories use this list
+  /// directly instead of computing rankings from [users].
+  List<LeaderboardEntry> get leaderboard => List.unmodifiable(_leaderboard);
+
+  void seedLeaderboard(List<LeaderboardEntry> entries) =>
+      _leaderboard = List.of(entries);
+
+  /// Updates a user's points in the seeded leaderboard, then re-sorts and
+  /// re-ranks so the page reflects the change immediately.
+  /// No-op if the userId is not in the seeded leaderboard.
+  void updateLeaderboardPoints(String userId, int totalPoints) {
+    final int index =
+        _leaderboard.indexWhere((LeaderboardEntry e) => e.userId == userId);
+    if (index == -1) return;
+
+    _leaderboard[index] = LeaderboardEntry(
+      rank: _leaderboard[index].rank,
+      userId: _leaderboard[index].userId,
+      displayName: _leaderboard[index].displayName,
+      totalPoints: totalPoints,
+    );
+
+    // Re-sort by points descending, then re-assign ranks 1…n.
+    _leaderboard.sort((LeaderboardEntry a, LeaderboardEntry b) =>
+        b.totalPoints.compareTo(a.totalPoints));
+    for (int i = 0; i < _leaderboard.length; i++) {
+      _leaderboard[i] = LeaderboardEntry(
+        rank: i + 1,
+        userId: _leaderboard[i].userId,
+        displayName: _leaderboard[i].displayName,
+        totalPoints: _leaderboard[i].totalPoints,
+      );
+    }
+  }
+
   // ── Reset operations ─────────────────────────────────────────────────────────
 
   /// Clears all data. After a full reset the app re-syncs games from the API.
@@ -102,6 +144,7 @@ class MockStore {
     _games.clear();
     _guesses.clear();
     _users.clear();
+    _leaderboard.clear();
     currentUserId = null;
   }
 
@@ -123,6 +166,8 @@ class MockStore {
         homeTeam: g.homeTeam,
         awayTeam: g.awayTeam,
         kickoffTime: g.kickoffTime,
+        round: g.round,
+        ground: g.ground,
         status: GameStatus.upcoming,
       );
     }).toList();

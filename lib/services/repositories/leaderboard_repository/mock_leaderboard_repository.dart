@@ -11,14 +11,20 @@ class MockLeaderboardRepository implements LeaderboardRepository {
 
   @override
   Future<List<LeaderboardEntry>> fetchTop10() async {
-    final entries = _allRanked();
+    final List<LeaderboardEntry> entries = _rankedEntries();
     return entries.take(LeaderboardEntry.maxSize).toList();
   }
 
   @override
   Future<LeaderboardEntry?> fetchUserEntry(String userId) async =>
-      _allRanked().where((e) => e.userId == userId).firstOrNull;
+      _rankedEntries().where((LeaderboardEntry e) => e.userId == userId).firstOrNull;
 
-  List<LeaderboardEntry> _allRanked() =>
-      buildRankedEntries(List.of(_store.users));
+  /// Returns seeded leaderboard if one was explicitly provided,
+  /// otherwise computes rankings from the users in MockStore.
+  List<LeaderboardEntry> _rankedEntries() {
+    if (_store.leaderboard.isNotEmpty) {
+      return List.of(_store.leaderboard);
+    }
+    return buildRankedEntries(List.of(_store.users));
+  }
 }

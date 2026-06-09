@@ -52,14 +52,17 @@ void main() {
   });
 
   group('fetchUpcomingGames', () {
-    test('returns only upcoming games', () async {
-      MockStore.instance.seedGames([game1, game2]);
-      MockStore.instance.setGameResult(
-        gameId: 'g1',
-        homeScore: 2,
-        awayScore: 1,
-        finishedAt: DateTime.utc(2026, 6, 11, 17, 0),
-      );
+    // kickoffTime in the past — should be excluded regardless of status
+    final pastGame = Game(
+      id: 'past',
+      homeTeam: mexico,
+      awayTeam: brazil,
+      kickoffTime: DateTime.utc(2020, 6, 11, 15, 0),
+      status: GameStatus.upcoming,
+    );
+
+    test('returns only games with a future kickoff time', () async {
+      MockStore.instance.seedGames([pastGame, game2]);
 
       final upcoming = await repo.fetchUpcomingGames();
 
@@ -67,14 +70,8 @@ void main() {
       expect(upcoming.first.id, 'g2');
     });
 
-    test('returns empty when all games are finished', () async {
-      MockStore.instance.seedGames([game1]);
-      MockStore.instance.setGameResult(
-        gameId: 'g1',
-        homeScore: 1,
-        awayScore: 0,
-        finishedAt: DateTime.utc(2026, 6, 11, 17, 0),
-      );
+    test('returns empty when all kickoff times are in the past', () async {
+      MockStore.instance.seedGames([pastGame]);
 
       expect(await repo.fetchUpcomingGames(), isEmpty);
     });

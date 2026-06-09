@@ -13,20 +13,23 @@ class FirestoreLeaderboardRepository implements LeaderboardRepository {
 
   @override
   Future<List<LeaderboardEntry>> fetchTop10() async {
-    final entries = await _fetchAllRanked();
+    final List<LeaderboardEntry> entries = await _fetchAllRanked();
     return entries.take(LeaderboardEntry.maxSize).toList();
   }
 
   @override
   Future<LeaderboardEntry?> fetchUserEntry(String userId) async {
-    final entries = await _fetchAllRanked();
-    return entries.where((e) => e.userId == userId).firstOrNull;
+    final List<LeaderboardEntry> entries = await _fetchAllRanked();
+    return entries.where((LeaderboardEntry e) => e.userId == userId).firstOrNull;
   }
 
   Future<List<LeaderboardEntry>> _fetchAllRanked() async {
-    final snap = await _firestore.collection('users').get();
-    final users = snap.docs
-        .map((d) => User.fromJson(d.id, d.data()))
+    final QuerySnapshot<Map<String, dynamic>> snap = await _firestore
+        .collection('users')
+        .get(const GetOptions(source: Source.server));
+    final List<User> users = snap.docs
+        .map((QueryDocumentSnapshot<Map<String, dynamic>> d) =>
+            User.fromJson(d.id, d.data()))
         .toList();
     return buildRankedEntries(users);
   }

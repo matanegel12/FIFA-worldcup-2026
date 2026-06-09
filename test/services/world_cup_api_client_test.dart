@@ -134,6 +134,20 @@ void main() {
       expect(finished.finishedAt, isNull);
     });
 
+    test('round is stored as raw string from API', () async {
+      final games = await _clientWith(_sampleJson).fetchGames();
+      expect(games[0].round, 'Matchday 1');
+      expect(games[1].round, 'Matchday 1');
+      expect(games[2].round, 'Matchday 1');
+    });
+
+    test('ground is parsed from API', () async {
+      final List<Game> games = await _clientWith(_sampleJson).fetchGames();
+      expect(games[0].ground, 'Mexico City');
+      expect(games[1].ground, 'Los Angeles');
+      expect(games[2].ground, 'Atlanta');
+    });
+
     test('throws when server returns non-200 status', () {
       expect(
         () => _clientWith('', statusCode: 500).fetchGames(),

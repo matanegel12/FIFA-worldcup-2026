@@ -21,7 +21,7 @@ class Guess {
         userId: json['userId'] as String,
         gameId: json['gameId'] as String,
         prediction: Prediction.values.byName(json['prediction'] as String),
-      );
+    );
 
   Map<String, dynamic> toJson() => {
         'userId': userId,
