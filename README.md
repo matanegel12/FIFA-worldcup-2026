@@ -29,6 +29,14 @@ dart pub global activate flutterfire_cli
 
 ---
 
+## Install Dependencies
+
+```bash
+flutter pub get
+```
+
+---
+
 ## Firebase Setup
 
 Run once after cloning to generate `lib/firebase_options.dart`:
