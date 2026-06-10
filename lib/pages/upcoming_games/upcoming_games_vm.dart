@@ -7,7 +7,6 @@ import '../../models/round_group.dart';
 import '../../models/user.dart';
 import '../../services/matchday_service.dart';
 import '../../services/repositories/auth_repository/auth_repository.dart';
-import '../../services/repositories/auth_repository/mock_auth_repository.dart';
 import '../../services/repositories/games_repository/games_repository.dart';
 import '../../services/repositories/guesses_repository/guesses_repository.dart';
 import 'upcoming_games_model.dart';
@@ -23,12 +22,12 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
   UpcomingGamesViewModel({
     required GamesRepository gamesRepository,
     required GuessesRepository guessesRepository,
+    required AuthRepository authRepository,
     required String userId,
-    AuthRepository? authRepository,
   })  : _gamesRepository = gamesRepository,
         _guessesRepository = guessesRepository,
+        _authRepository = authRepository,
         _userId = userId,
-        _authRepository = authRepository ?? MockAuthRepository(),
         super(model: UpcomingGamesModel());
 
   @override
@@ -62,6 +61,11 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
       model.isLoading = false;
       notify();
     }
+  }
+
+  Future<void> onSignOut() async {
+    await _authRepository.signOut();
+    notifyNavigate(NavigateModel(routeName: '/sign-in', replace: true));
   }
 
   Future<void> onPredictionChanged(

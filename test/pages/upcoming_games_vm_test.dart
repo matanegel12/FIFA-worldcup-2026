@@ -4,6 +4,7 @@ import 'package:fifa_worldcup_2026_predictions/models/guess.dart';
 import 'package:fifa_worldcup_2026_predictions/models/team.dart';
 import 'package:fifa_worldcup_2026_predictions/pages/upcoming_games/upcoming_games_vm.dart';
 import 'package:fifa_worldcup_2026_predictions/services/mock/mock_store.dart';
+import 'package:fifa_worldcup_2026_predictions/services/repositories/auth_repository/mock_auth_repository.dart';
 import 'package:fifa_worldcup_2026_predictions/services/repositories/games_repository/mock_games_repository.dart';
 import 'package:fifa_worldcup_2026_predictions/services/repositories/guesses_repository/mock_guesses_repository.dart';
 
@@ -36,6 +37,7 @@ Game _pastGame(String id) => Game(
 UpcomingGamesViewModel _makeVm() => UpcomingGamesViewModel(
       gamesRepository: MockGamesRepository(),
       guessesRepository: MockGuessesRepository(),
+      authRepository: MockAuthRepository(),
       userId: _userId,
     );
 

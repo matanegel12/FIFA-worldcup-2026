@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fifa_worldcup_2026_predictions/pages/main_shell/main_shell_vm.dart';
 import 'package:fifa_worldcup_2026_predictions/services/mock/mock_store.dart';
+import 'package:fifa_worldcup_2026_predictions/services/repositories/auth_repository/mock_auth_repository.dart';
 import 'package:fifa_worldcup_2026_predictions/services/repositories/games_repository/mock_games_repository.dart';
 import 'package:fifa_worldcup_2026_predictions/services/repositories/guesses_repository/mock_guesses_repository.dart';
 import 'package:fifa_worldcup_2026_predictions/services/repositories/leaderboard_repository/mock_leaderboard_repository.dart';
@@ -9,6 +10,7 @@ MainShellViewModel _makeVm() => MainShellViewModel(
       gamesRepository: MockGamesRepository(),
       guessesRepository: MockGuessesRepository(),
       leaderboardRepository: MockLeaderboardRepository(),
+      authRepository: MockAuthRepository(),
     );
 
 void main() {
