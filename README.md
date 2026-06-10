@@ -73,14 +73,6 @@ flutter test
 
 ---
 
-## Admin Panel
-
-The admin panel is visible only when signed in with the admin account (`test@test.com` in development). A floating action button (⚙️) appears in the bottom-right corner of the main screen.
-
-The admin panel shows all games where kickoff has passed but no score has been recorded yet. Enter the final score and tap **Save** — the scoring engine runs automatically, user points update, and the leaderboard refreshes.
-
----
-
 ## Design Decisions
 
 | Topic | Decision |
