@@ -62,6 +62,7 @@ class App extends StatelessWidget {
                 gamesRepository: gamesRepository,
                 guessesRepository: guessesRepository,
                 leaderboardRepository: leaderboardRepository,
+                authRepository: authRepository,
                 gameSyncService: gameSyncService,
               ),
             ),

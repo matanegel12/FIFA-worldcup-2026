@@ -20,7 +20,7 @@ class MainShellPage extends BasePage<MainShellModel, MainShellViewModel> {
 
   @override
   BasePageState<MainShellModel, MainShellViewModel, MainShellPage>
-      createState() => _MainShellPageState();
+  createState() => _MainShellPageState();
 }
 
 class _MainShellPageState
@@ -37,9 +37,7 @@ class _MainShellPageState
   void initState() {
     super.initState();
     _resultsPage = ResultsPage(
-      viewModel: ResultsViewModel(
-        gamesRepository: viewModel.gamesRepository,
-      ),
+      viewModel: ResultsViewModel(gamesRepository: viewModel.gamesRepository),
     );
   }
 
@@ -51,12 +49,12 @@ class _MainShellPageState
 
   @override
   Widget? get bottomNavigationBar => MainBottomNav(
-        onUpcomingTapped: () => viewModel.onTabChanged(0),
-        onResultsTapped: () => viewModel.onTabChanged(1),
-        onPredictionsTapped: () => viewModel.onTabChanged(2),
-        onLeaderboardTapped: () => viewModel.onTabChanged(3),
-        currentIndex: model.currentIndex,
-      );
+    onUpcomingTapped: () => viewModel.onTabChanged(0),
+    onResultsTapped: () => viewModel.onTabChanged(1),
+    onPredictionsTapped: () => viewModel.onTabChanged(2),
+    onLeaderboardTapped: () => viewModel.onTabChanged(3),
+    currentIndex: model.currentIndex,
+  );
 
   /// FAB is only visible to the admin user.
   @override
@@ -85,6 +83,7 @@ class _MainShellPageState
           viewModel: UpcomingGamesViewModel(
             gamesRepository: viewModel.gamesRepository,
             guessesRepository: viewModel.guessesRepository,
+            authRepository: viewModel.authRepository,
             userId: model.userId,
           ),
         );
@@ -110,6 +109,7 @@ class _MainShellPageState
           viewModel: UpcomingGamesViewModel(
             gamesRepository: viewModel.gamesRepository,
             guessesRepository: viewModel.guessesRepository,
+            authRepository: viewModel.authRepository,
             userId: model.userId,
           ),
         );

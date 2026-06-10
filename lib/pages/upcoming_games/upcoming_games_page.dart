@@ -61,6 +61,13 @@ class _UpcomingGamesPageState
   @override
   PreferredSizeWidget? get appBar => AppBar(
         title: Text(model.appBarTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sign out',
+            onPressed: viewModel.onSignOut,
+          ),
+        ],
       );
 
   @override
