@@ -16,6 +16,7 @@ class Game {
   final DateTime? finishedAt; // UTC — set when result is recorded, used for new results popup
   final String round; // raw string from the API e.g. "Matchday 1", "Matchday 8"
   final String ground; // venue name e.g. "Mexico City"
+  final bool isTestResult; // true only for admin test scores — excluded from real scoring
 
   const Game({
     required this.id,
@@ -28,6 +29,7 @@ class Game {
     this.finishedAt,
     this.round = '',
     this.ground = '',
+    this.isTestResult = false,
   });
 
   bool get isFinished => status == GameStatus.finished;
@@ -42,7 +44,8 @@ class Game {
   }
 
   /// Date portion of kickoffTime in UTC.
-  /// Used by the scoring engine to group games by day for the set bonus.
+  /// Used for display and date comparisons (e.g. new-results popup).
+  /// The scoring engine groups by game.round, not this field.
   DateTime get matchDay => DateTime.utc(
         kickoffTime.year,
         kickoffTime.month,
@@ -66,6 +69,7 @@ class Game {
             : null,
         round: (json['round'] as String?) ?? '',
         ground: (json['ground'] as String?) ?? '',
+        isTestResult: (json['isTestResult'] as bool?) ?? false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -79,6 +83,7 @@ class Game {
         'finishedAt': finishedAt?.toIso8601String(),
         'round': round,
         'ground': ground,
+        'isTestResult': isTestResult,
       };
 
   @override
