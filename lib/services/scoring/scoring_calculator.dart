@@ -27,15 +27,16 @@ ScoreSummary calculate({
     }
   }
 
-  // Group finished games by their UTC calendar day.
-  final Map<DateTime, List<Game>> gamesByDay = {};
+  // Group finished games by their match day (round field).
+  // A set is all games belonging to the same match day.
+  final Map<String, List<Game>> gamesByRound = {};
   for (final game in finishedGames) {
-    gamesByDay.putIfAbsent(game.matchDay, () => []).add(game);
+    gamesByRound.putIfAbsent(game.round, () => []).add(game);
   }
 
   int setBonusCount = 0;
-  for (final entry in gamesByDay.entries) {
-    if (_isPerfectDay(entry.value, guessMap)) {
+  for (final entry in gamesByRound.entries) {
+    if (_isPerfectMatchDay(entry.value, guessMap)) {
       setBonusCount++;
     }
   }
@@ -47,14 +48,15 @@ ScoreSummary calculate({
   );
 }
 
-/// Returns true when the user correctly predicted every game on this day.
+/// Returns true when the user correctly predicted every game in this match day.
 ///
-/// This is the single definition of a "set". To change the bonus rule
-/// (e.g. "all games in a group" instead of "all games in a day"),
-/// change only this function.
-bool _isPerfectDay(List<Game> gamesOnDay, Map<String, Guess> guessMap) {
-  if (gamesOnDay.isEmpty) return false;
-  return gamesOnDay.every((game) {
+/// This is the single definition of a "set". A set is all games in the same
+/// match day (round field, e.g. "Matchday 1"). If the user correctly predicted
+/// every game in a match day, +2 bonus points are awarded for that match day.
+/// To change the bonus rule, change only this function.
+bool _isPerfectMatchDay(List<Game> gamesInMatchDay, Map<String, Guess> guessMap) {
+  if (gamesInMatchDay.isEmpty) return false;
+  return gamesInMatchDay.every((game) {
     final guess = guessMap[game.id];
     return guess != null && guess.prediction == game.outcome;
   });
