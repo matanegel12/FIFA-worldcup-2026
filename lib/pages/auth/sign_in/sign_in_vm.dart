@@ -34,7 +34,7 @@ class SignInViewModel extends ViewModel<SignInModel> {
   }
 
   void goToSignUp() {
-    notifyNavigate(NavigateModel(routeName: '/sign-up'));
+    notifyNavigate(NavigateModel(routeName: '/sign-up', replace: true));
   }
 
   String _friendlyError(Object e) {
