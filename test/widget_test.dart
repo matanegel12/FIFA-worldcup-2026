@@ -48,7 +48,6 @@ void main() {
   testWidgets('UpcomingGameCard shows team names and match info', (WidgetTester tester) async {
     await tester.pumpWidget(_cardInApp(UpcomingGameCard(
       game: _futureGame,
-      isMatchdayUnlocked: true,
       onPredictionChanged: (_) {},
     )));
 
@@ -58,26 +57,14 @@ void main() {
     expect(find.textContaining('Mexico City'), findsOneWidget);
   });
 
-  testWidgets('UpcomingGameCard shows Place your bet when unlocked', (WidgetTester tester) async {
+  testWidgets('UpcomingGameCard shows prediction buttons for any future game', (WidgetTester tester) async {
     await tester.pumpWidget(_cardInApp(UpcomingGameCard(
       game: _futureGame,
-      isMatchdayUnlocked: true,
       onPredictionChanged: (_) {},
     )));
 
     expect(find.text('Place your bet'), findsOneWidget);
     expect(find.text('Draw'), findsOneWidget);
-  });
-
-  testWidgets('UpcomingGameCard shows locked banner when matchday is locked', (WidgetTester tester) async {
-    await tester.pumpWidget(_cardInApp(UpcomingGameCard(
-      game: _futureGame,
-      isMatchdayUnlocked: false,
-      onPredictionChanged: (_) {},
-    )));
-
-    expect(find.textContaining('Locked'), findsOneWidget);
-    expect(find.text('Draw'), findsNothing);
   });
 
   testWidgets('UpcomingGameCard reflects existing guess selection', (WidgetTester tester) async {
@@ -89,12 +76,10 @@ void main() {
 
     await tester.pumpWidget(_cardInApp(UpcomingGameCard(
       game: _futureGame,
-      isMatchdayUnlocked: true,
       existingGuess: existingGuess,
       onPredictionChanged: (_) {},
     )));
 
-    // SegmentedButton with Mexico selected — Draw and Brazil are visible too
     expect(find.text('Mexico'), findsWidgets);
     expect(find.text('Draw'), findsOneWidget);
     expect(find.text('Brazil'), findsWidgets);

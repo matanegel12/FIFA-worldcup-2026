@@ -1,19 +1,5 @@
 import '../models/game.dart';
 
-/// Returns true when [matchday] is open for predictions.
-///
-/// A matchday is unlocked if and only if it is the first round
-/// in [futureGames] — i.e. it has the lowest round number among
-/// games whose kickoff is still in the future.
-///
-/// [futureGames] must already be filtered to games where
-/// kickoffTime > now — this function does not filter itself.
-bool isMatchdayUnlocked(String matchday, List<Game> futureGames) {
-  final List<String> sorted = sortedRounds(futureGames);
-  if (sorted.isEmpty) return false;
-  return sorted.first == matchday;
-}
-
 /// Returns unique round strings sorted by the number embedded in them.
 /// "Matchday 8" → 8, used only for ordering — the raw strings are preserved.
 /// Public so the ViewModel can reuse it when building grouped game lists.

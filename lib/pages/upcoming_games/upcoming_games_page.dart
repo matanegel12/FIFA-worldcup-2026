@@ -107,14 +107,9 @@ class _UpcomingGamesPageState
     for (final RoundGroup group in model.groupedGames) {
       items.add(_buildGroupHeader(group.round, group.date));
 
-      if (!group.isUnlocked) {
-        items.add(_buildLockedBanner(group.round));
-      }
-
       for (final Game game in group.games) {
         items.add(UpcomingGameCard(
           game: game,
-          isMatchdayUnlocked: group.isUnlocked,
           existingGuess: model.guessForGame(game.id),
           onPredictionChanged: (Prediction p) =>
               viewModel.onPredictionChanged(game.id, p),
@@ -142,22 +137,6 @@ class _UpcomingGamesPageState
           color: Colors.black87,
           letterSpacing: 0.5,
         ),
-      ),
-    );
-  }
-
-  Widget _buildLockedBanner(String round) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppTheme.lockedBannerBg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.primary),
-      ),
-      child: Text(
-        '🔒 Opens after $round ends',
-        style: const TextStyle(fontSize: 13, color: AppTheme.primary),
       ),
     );
   }

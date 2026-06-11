@@ -7,19 +7,17 @@ import '../../../widgets/shared/team_flag.dart';
 
 class UpcomingGameCard extends StatelessWidget {
   final Game game;
-  final bool isMatchdayUnlocked;
   final Guess? existingGuess;
   final void Function(Prediction prediction) onPredictionChanged;
 
   const UpcomingGameCard({
     required this.game,
-    required this.isMatchdayUnlocked,
     required this.onPredictionChanged,
     this.existingGuess,
     super.key,
   });
 
-  /// True once the game's kickoff time has passed.
+  /// True once the game's kickoff time has passed — the only lock that applies.
   bool get _isKickoffPassed =>
       game.kickoffTime.isBefore(DateTime.now().toUtc());
 
@@ -33,7 +31,7 @@ class UpcomingGameCard extends StatelessWidget {
           children: [
             _buildTeamsRow(),
             const SizedBox(height: 12),
-            _buildPredictionSection(context),
+            _buildPredictionSection(),
             const SizedBox(height: 10),
             _buildLockBadge(),
             const SizedBox(height: 8),
@@ -49,7 +47,6 @@ class UpcomingGameCard extends StatelessWidget {
   Widget _buildTeamsRow() {
     return Column(
       children: [
-        // Row 1: flag left — "Place your bet" centre — flag right
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -68,7 +65,6 @@ class UpcomingGameCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 4),
-        // Row 2: team name left — team name right
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -95,19 +91,7 @@ class UpcomingGameCard extends StatelessWidget {
 
   // ── Prediction buttons ────────────────────────────────────────────────────
 
-  Widget _buildPredictionSection(BuildContext context) {
-    if (!isMatchdayUnlocked) {
-      return const Text(
-        '🔒 Locked — previous matchday not finished yet',
-        style: TextStyle(
-          fontSize: 11,
-          color: AppTheme.primary,
-          fontWeight: FontWeight.w500,
-        ),
-        textAlign: TextAlign.center,
-      );
-    }
-
+  Widget _buildPredictionSection() {
     final Prediction? selected = existingGuess?.prediction;
 
     return SegmentedButton<Prediction>(
@@ -136,7 +120,7 @@ class UpcomingGameCard extends StatelessWidget {
             },
       style: SegmentedButton.styleFrom(
         backgroundColor: Colors.white,
-        selectedBackgroundColor: AppTheme.secondary,  // gold when selected
+        selectedBackgroundColor: AppTheme.secondary,
         selectedForegroundColor: Colors.black,
         foregroundColor: Colors.black87,
         side: const BorderSide(color: Colors.black12),
@@ -144,7 +128,7 @@ class UpcomingGameCard extends StatelessWidget {
     );
   }
 
-  // ── Red badge ─────────────────────────────────────────────────────────────
+  // ── Lock badge ────────────────────────────────────────────────────────────
 
   Widget _buildLockBadge() {
     return Center(
