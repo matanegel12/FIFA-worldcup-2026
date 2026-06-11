@@ -153,12 +153,13 @@ class UpcomingGameCard extends StatelessWidget {
   // ── Match info ────────────────────────────────────────────────────────────
 
   Widget _buildMatchInfo() {
-    final DateTime kickoff = game.kickoffTime;
-    final String hour = kickoff.hour.toString().padLeft(2, '0');
-    final String minute = kickoff.minute.toString().padLeft(2, '0');
+    final DateTime kickoffUtc = game.kickoffTime.toUtc();
+    final DateTime kickoffIL = kickoffUtc.add(const Duration(hours: 3));
+    final String hour = kickoffIL.hour.toString().padLeft(2, '0');
+    final String minute = kickoffIL.minute.toString().padLeft(2, '0');
     final String location = game.ground.isNotEmpty
-        ? '$hour:$minute UTC · ${game.ground}'
-        : '$hour:$minute UTC';
+        ? '$hour:$minute IL · ${game.ground}'
+        : '$hour:$minute IL';
 
     return Text(
       '🕐 $location',
