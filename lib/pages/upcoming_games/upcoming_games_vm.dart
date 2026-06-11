@@ -140,7 +140,6 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
           games.first.kickoffTime.month,
           games.first.kickoffTime.day,
         ),
-        isUnlocked: i == 0,
         games: games,
       ));
     }

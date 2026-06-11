@@ -160,25 +160,6 @@ void main() {
       expect(vm.model.groupedGames[2].round, 'Matchday 14');
     });
 
-    test('first group is always unlocked', () async {
-      MockStore.instance.seedGames([
-        _futureGame('g1', 'Matchday 1'),
-        _futureGame('g2', 'Matchday 8'),
-      ]);
-      await vm.loadGames();
-      expect(vm.model.groupedGames[0].isUnlocked, isTrue);
-    });
-
-    test('all groups after the first are locked', () async {
-      MockStore.instance.seedGames([
-        _futureGame('g1', 'Matchday 1'),
-        _futureGame('g2', 'Matchday 8'),
-        _futureGame('g3', 'Matchday 14'),
-      ]);
-      await vm.loadGames();
-      expect(vm.model.groupedGames[1].isUnlocked, isFalse);
-      expect(vm.model.groupedGames[2].isUnlocked, isFalse);
-    });
   });
 
   group('loadGames — retry', () {

@@ -10,13 +10,11 @@ class RoundGroup {
   /// Date only — no time component. Always UTC.
   final DateTime date;
 
-  final bool isUnlocked;
   final List<Game> games;
 
   const RoundGroup({
     required this.round,
     required this.date,
-    required this.isUnlocked,
     required this.games,
   });
 }
