@@ -1,0 +1,75 @@
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "/flutter_service_worker.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        ]
+      },
+      {
+        "source": "/index.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        ]
+      },
+      {
+        "source": "/main.dart.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "fifa-worldcup-2026-predictions",
+          "appId": "1:584262741109:android:19640ae7fb9171944f9c3c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "fifa-worldcup-2026-predictions",
+          "appId": "1:584262741109:ios:561c4f08f27313614f9c3c",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "fifa-worldcup-2026-predictions",
+          "appId": "1:584262741109:ios:561c4f08f27313614f9c3c",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "fifa-worldcup-2026-predictions",
+          "configurations": {
+            "android": "1:584262741109:android:19640ae7fb9171944f9c3c",
+            "ios": "1:584262741109:ios:561c4f08f27313614f9c3c",
+            "macos": "1:584262741109:ios:561c4f08f27313614f9c3c",
+            "web": "1:584262741109:web:c24ff87576cd2ade4f9c3c",
+            "windows": "1:584262741109:web:97615959cbcb0bab4f9c3c"
+          }
+        }
+      }
+    }
+  }
+}
