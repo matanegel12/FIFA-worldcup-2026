@@ -32,6 +32,27 @@ Game _finishedGame({
       round: round,
     );
 
+/// A finished knockout game (kickoff at/after the cutoff → +2 rules).
+/// Defaults to exactly the cutoff instant to also cover the boundary.
+Game _knockoutGame({
+  required String id,
+  required int homeScore,
+  required int awayScore,
+  String round = 'Round of 32',
+  DateTime? kickoffTime,
+}) =>
+    Game(
+      id: id,
+      homeTeam: france,
+      awayTeam: germany,
+      kickoffTime: kickoffTime ?? DateTime.utc(2026, 6, 28, 19, 0), // cutoff
+      homeScore: homeScore,
+      awayScore: awayScore,
+      status: GameStatus.finished,
+      finishedAt: DateTime.utc(2026, 6, 28, 21, 0),
+      round: round,
+    );
+
 /// A guess submitted by the test user.
 Guess _guess(String gameId, Prediction prediction) => Guess(
       userId: 'uid-test',
@@ -265,6 +286,67 @@ void main() {
       expect(summary.correctGuesses, 2);
       expect(summary.setBonusCount, 1);   // only Matchday 1
       expect(summary.totalPoints, 4);     // 2 + 2
+    });
+  });
+
+  group('knockout scoring', () {
+    test('+2 for a correct knockout prediction', () {
+      final game = _knockoutGame(id: 'k1', homeScore: 2, awayScore: 1); // teamAWins
+      final summary = _calc([game], [_guess('k1', Prediction.teamAWins)]);
+
+      expect(summary.knockoutCorrectGuesses, 1);
+      expect(summary.correctGuesses, 0); // not counted as group-stage
+      expect(summary.setBonusCount, 0);
+      expect(summary.totalPoints, 2);
+    });
+
+    test('+0 for a wrong knockout prediction', () {
+      final game = _knockoutGame(id: 'k1', homeScore: 2, awayScore: 1); // teamAWins
+      final summary = _calc([game], [_guess('k1', Prediction.teamBWins)]);
+
+      expect(summary.knockoutCorrectGuesses, 0);
+      expect(summary.totalPoints, 0);
+    });
+
+    test('knockout games never earn a set bonus, even a perfect round', () {
+      // Two correct knockout games in the same round — no bonus, just 2+2.
+      final k1 = _knockoutGame(id: 'k1', homeScore: 1, awayScore: 0);
+      final k2 = _knockoutGame(id: 'k2', homeScore: 0, awayScore: 2);
+      final summary = _calc([k1, k2], [
+        _guess('k1', Prediction.teamAWins),
+        _guess('k2', Prediction.teamBWins),
+      ]);
+
+      expect(summary.knockoutCorrectGuesses, 2);
+      expect(summary.setBonusCount, 0);
+      expect(summary.totalPoints, 4); // 2 × 2, no bonus
+    });
+
+    test('a game before the cutoff still uses group-stage rules', () {
+      // _finishedGame kicks off 2026-06-11, well before the cutoff.
+      final game = _finishedGame(id: 'g1', homeScore: 1, awayScore: 0);
+      final summary = _calc([game], [_guess('g1', Prediction.teamAWins)]);
+
+      expect(summary.correctGuesses, 1);
+      expect(summary.knockoutCorrectGuesses, 0);
+      expect(summary.setBonusCount, 1); // single perfect group-stage round
+      expect(summary.totalPoints, 3); // 1 + 2 bonus
+    });
+
+    test('mixed group-stage and knockout games score under their own rules', () {
+      // Group stage: a perfect round worth 1 + 2 = 3.
+      final gs = _finishedGame(id: 'g1', homeScore: 1, awayScore: 0);
+      // Knockout: one correct worth 2.
+      final ko = _knockoutGame(id: 'k1', homeScore: 0, awayScore: 1);
+      final summary = _calc([gs, ko], [
+        _guess('g1', Prediction.teamAWins),
+        _guess('k1', Prediction.teamBWins),
+      ]);
+
+      expect(summary.correctGuesses, 1);
+      expect(summary.knockoutCorrectGuesses, 1);
+      expect(summary.setBonusCount, 1);
+      expect(summary.totalPoints, 5); // (1 + 2 bonus) + 2
     });
   });
 

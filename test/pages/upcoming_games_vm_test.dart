@@ -24,6 +24,18 @@ Game _futureGame(String id, String round, {int hour = 15}) => Game(
       round: round,
     );
 
+/// A future group-stage game: after the test clock (2026-06-25) but before the
+/// knockout cutoff (2026-06-28 19:00 UTC), so it is grouped under group-stage
+/// rules (isKnockout == false).
+Game _groupStageGame(String id, String round, {int hour = 15}) => Game(
+      id: id,
+      homeTeam: _mexico,
+      awayTeam: _brazil,
+      kickoffTime: DateTime.utc(2026, 6, 27, hour, 0),
+      status: GameStatus.upcoming,
+      round: round,
+    );
+
 /// Kickoff in the past — filtered out by the repository (fetchUpcomingGames).
 Game _pastGame(String id) => Game(
       id: id,
@@ -160,6 +172,21 @@ void main() {
       expect(vm.model.groupedGames[2].round, 'Matchday 14');
     });
 
+  });
+
+  group('loadGames — knockout flag', () {
+    test('group-stage groups are not flagged as knockout', () async {
+      MockStore.instance.seedGames([_groupStageGame('g1', 'Matchday 1')]);
+      await vm.loadGames();
+      expect(vm.model.groupedGames.first.isKnockout, isFalse);
+    });
+
+    test('knockout groups (kickoff at/after cutoff) are flagged as knockout',
+        () async {
+      MockStore.instance.seedGames([_futureGame('k1', 'Round of 32')]);
+      await vm.loadGames();
+      expect(vm.model.groupedGames.first.isKnockout, isTrue);
+    });
   });
 
   group('loadGames — retry', () {

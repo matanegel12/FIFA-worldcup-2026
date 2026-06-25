@@ -10,11 +10,16 @@ class RoundGroup {
   /// Date only — no time component. Always UTC.
   final DateTime date;
 
+  /// True for knockout-stage groups (kickoff at/after the knockout cutoff).
+  /// Drives the "2 pts" header badge and the "≈120 min" card note in the View.
+  final bool isKnockout;
+
   final List<Game> games;
 
   const RoundGroup({
     required this.round,
     required this.date,
     required this.games,
+    this.isKnockout = false,
   });
 }

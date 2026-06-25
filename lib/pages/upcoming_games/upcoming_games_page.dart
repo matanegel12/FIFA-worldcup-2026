@@ -105,11 +105,12 @@ class _UpcomingGamesPageState
     final List<Widget> items = [];
 
     for (final RoundGroup group in model.groupedGames) {
-      items.add(_buildGroupHeader(group.round, group.date));
+      items.add(_buildGroupHeader(group.round, group.date, group.isKnockout));
 
       for (final Game game in group.games) {
         items.add(UpcomingGameCard(
           game: game,
+          isKnockout: group.isKnockout,
           existingGuess: model.guessForGame(game.id),
           onPredictionChanged: (Prediction p) =>
               viewModel.onPredictionChanged(game.id, p),
@@ -126,16 +127,43 @@ class _UpcomingGamesPageState
     );
   }
 
-  Widget _buildGroupHeader(String round, DateTime firstKickoff) {
+  Widget _buildGroupHeader(String round, DateTime firstKickoff, bool isKnockout) {
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
-      child: Text(
-        '$round · ${_formatDate(firstKickoff)}',
-        style: const TextStyle(
-          fontSize: 14,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              '$round · ${_formatDate(firstKickoff)}',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          if (isKnockout) _buildPointsBadge(),
+        ],
+      ),
+    );
+  }
+
+  /// "2 pts" badge shown at the end of a knockout round header — these games
+  /// are worth 2 points each (no match-day set bonus).
+  Widget _buildPointsBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppTheme.secondary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: const Text(
+        '2 pts',
+        style: TextStyle(
+          fontSize: 11,
           fontWeight: FontWeight.bold,
-          color: Colors.black87,
-          letterSpacing: 0.5,
+          color: Colors.black,
         ),
       ),
     );

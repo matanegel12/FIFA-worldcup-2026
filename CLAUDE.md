@@ -227,14 +227,31 @@ test/                             # Mirrors lib/ structure
 - **Source:** `openfootball/worldcup.json` — free, no API key, public-domain JSON with the full 2026 schedule.
 - Fetched by `WorldCupApiClient`, synced to Firestore once every 24 hours by `GameSyncService`.
 - Only schedule fields (teams, kickoff time, round, ground) are written to Firestore. Scores are **never** overwritten by the sync — they are managed exclusively by the admin panel.
+- **Knockout fixtures** are added by hand in `lib/services/sync/hardcoded_games.dart`
+  (the public feed uses placeholder teams like "1A"/"W73", which the API client
+  drops). `GameSyncService` writes them to Firestore exactly like API games —
+  schedule fields only, merged, scores untouched — and writes them *first* so
+  they persist even if the API call fails. To add a fixture, append to
+  `kHardcodedGames`. They are knockout purely by their kickoff time (≥ cutoff).
 - For flags: ISO country codes map to `flagcdn.com` URLs via `Team.flagUrl`.
 
 ### Predictions & Scoring
 - Users guess: **Team A wins**, **Team B wins**, or **Draw**.
 - Guesses **lock at kickoff** and cannot be changed after.
-- **+1 point** for each correctly guessed game.
-- **+2 bonus points** for getting all games on the same day correct (the "set").
-- The set definition lives in one clearly-documented function in `scoring_calculator.dart` so it can be changed without touching anything else.
+- There are **two scoring regimes**, switched by a single cutoff constant
+  `kKnockoutCutoff` in `scoring_calculator.dart` (**2026-06-28 19:00 UTC** =
+  Sunday 28 June 2026, 22:00 Israel time). A game's regime is decided by its
+  kickoff time relative to this instant — nothing on the `Game` model.
+  - **Group stage** (kickoff *before* the cutoff): **+1** per correct game,
+    plus **+2** for getting every game in the same match day correct (grouped
+    by the `round` field — the "set").
+  - **Knockout stage** (kickoff *at/after* the cutoff): **+2** per correct game,
+    **no set bonus** and games are **never grouped into match days**. Knockout
+    results are judged at ~120 minutes (penalties do not affect the outcome).
+- The cutoff and the "set" definition both live in `scoring_calculator.dart`
+  (`kKnockoutCutoff`, `usesKnockoutRules`, `_isPerfectMatchDay`) so the rules can
+  be changed in one place. The same constant drives the UI ("2 pts" badge,
+  "≈120 min" note).
 
 ### Leaderboard
 - Show **top 10 users** by total points.
@@ -264,9 +281,10 @@ These are called out explicitly in the PDF. Decisions must be written into the R
 | Topic | Decision |
 |---|---|
 | **Timezones** | Store all times in UTC; display in user's local timezone |
-| **Guess locking** | Lock at kickoff; admin panel respects this rule too |
-| **Draws in knockout stage** | Project is scoped to the group stage only (draws valid) |
-| **Set definition for +2 bonus** | All games on the same calendar day (UTC); confirm with buddy |
+| **Guess locking** | Lock at kickoff; admin panel respects this rule too. Each game is open until its own kickoff |
+| **Scoring cutoff** | `kKnockoutCutoff` = 2026-06-28 19:00 UTC (28 Jun, 22:00 IL). Kickoff before → group-stage rules; at/after → knockout rules |
+| **Draws in knockout stage** | Knockout result is judged at ~120 min (penalties excluded). A draw at 120' is a valid `Draw` outcome for scoring |
+| **Set definition for +2 bonus** | Group stage only: all games in the same match day (the `round` field). Knockout games never form a set |
 | **Source of truth when mock and real API disagree** | Data source is explicitly switchable; mock wins during testing |
 | **Auth backend** | Firebase Authentication; no plain-text passwords |
 | **Leaderboard ties** | Earliest to reach the score wins |

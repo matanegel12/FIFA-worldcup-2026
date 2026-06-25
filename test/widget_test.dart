@@ -53,7 +53,7 @@ void main() {
 
     expect(find.text('Mexico'), findsWidgets);
     expect(find.text('Brazil'), findsWidgets);
-    expect(find.textContaining('UTC'), findsOneWidget);
+    expect(find.textContaining('IL'), findsOneWidget); // card shows kickoff in IL time
     expect(find.textContaining('Mexico City'), findsOneWidget);
   });
 

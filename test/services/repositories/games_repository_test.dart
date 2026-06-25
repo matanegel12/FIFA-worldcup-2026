@@ -61,13 +61,22 @@ void main() {
       status: GameStatus.upcoming,
     );
 
+    // Dated after the current clock so it stays "upcoming" as time advances.
+    final futureGame = Game(
+      id: 'future',
+      homeTeam: mexico,
+      awayTeam: brazil,
+      kickoffTime: DateTime.utc(2026, 6, 27, 15, 0),
+      status: GameStatus.upcoming,
+    );
+
     test('returns only games with a future kickoff time', () async {
-      MockStore.instance.seedGames([pastGame, game2]);
+      MockStore.instance.seedGames([pastGame, futureGame]);
 
       final upcoming = await repo.fetchUpcomingGames();
 
       expect(upcoming.length, 1);
-      expect(upcoming.first.id, 'g2');
+      expect(upcoming.first.id, 'future');
     });
 
     test('returns empty when all kickoff times are in the past', () async {

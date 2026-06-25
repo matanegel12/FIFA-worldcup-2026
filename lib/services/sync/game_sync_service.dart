@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../api/world_cup_api_client.dart';
 import '../../models/game.dart';
+import 'hardcoded_games.dart';
 
 class GameSyncService {
   static const Duration _syncInterval = Duration(hours: 24);
@@ -18,6 +19,11 @@ class GameSyncService {
         _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<void> syncIfNeeded() async {
+    // Manually-added games are local data, not from the API, so they must NOT
+    // be gated by the 24h throttle below — otherwise a newly-added fixture only
+    // appears after the next API sync window. This merge is cheap and idempotent.
+    await _ensureHardcodedGames();
+
     final DateTime? lastSync = await _getLastSyncTime();
     final bool needsSync = lastSync == null ||
         DateTime.now().toUtc().difference(lastSync) > _syncInterval;
@@ -32,6 +38,16 @@ class GameSyncService {
         return;
       }
       rethrow;
+    }
+  }
+
+  /// Writes the hand-added knockout fixtures every startup (schedule fields only,
+  /// merged — never touches admin scores). Best-effort: ignored if offline.
+  Future<void> _ensureHardcodedGames() async {
+    try {
+      await _writeSchedule(kHardcodedGames);
+    } catch (_) {
+      // Offline or transient Firestore error — the next launch retries.
     }
   }
 
@@ -60,17 +76,27 @@ class GameSyncService {
   }
 
   Future<void> _syncFromApi() async {
+    // Hardcoded games are seeded separately in _ensureHardcodedGames (every
+    // startup, not gated by the 24h throttle), so we only fetch the API here.
     final List<Game> games = await _apiClient.fetchGames();
+    await _writeSchedule(games);
 
+    await _firestore
+        .collection(_metaCollection)
+        .doc(_syncDocument)
+        .set({'lastSyncAt': FieldValue.serverTimestamp()});
+  }
+
+  /// Writes schedule fields only — never overwrites admin-entered scores.
+  /// status, homeScore, awayScore and finishedAt are managed by the admin panel.
+  /// round already carries group/stage info e.g. "Group A", "Round of 32".
+  Future<void> _writeSchedule(List<Game> games) async {
     final WriteBatch batch = _firestore.batch();
 
     for (final Game game in games) {
       final DocumentReference<Map<String, dynamic>> ref =
           _firestore.collection('games').doc(game.id);
 
-      // Only write schedule fields — never overwrite admin-entered scores.
-      // status, homeScore, awayScore, finishedAt are managed by admin panel only.
-      // round already carries group info e.g. "Group A", "Group B".
       batch.set(
         ref,
         {
@@ -84,11 +110,6 @@ class GameSyncService {
         SetOptions(merge: true),
       );
     }
-
-    batch.set(
-      _firestore.collection(_metaCollection).doc(_syncDocument),
-      {'lastSyncAt': FieldValue.serverTimestamp()},
-    );
 
     await batch.commit();
   }

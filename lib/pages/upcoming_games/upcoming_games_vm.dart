@@ -6,6 +6,7 @@ import '../../models/guess.dart';
 import '../../models/round_group.dart';
 import '../../models/user.dart';
 import '../../services/matchday_service.dart';
+import '../../services/scoring/scoring_calculator.dart';
 import '../../services/repositories/auth_repository/auth_repository.dart';
 import '../../services/repositories/games_repository/games_repository.dart';
 import '../../services/repositories/guesses_repository/guesses_repository.dart';
@@ -140,6 +141,7 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
           games.first.kickoffTime.month,
           games.first.kickoffTime.day,
         ),
+        isKnockout: usesKnockoutRules(games.first),
         games: games,
       ));
     }

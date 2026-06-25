@@ -7,12 +7,14 @@ import '../../../widgets/shared/team_flag.dart';
 
 class UpcomingGameCard extends StatelessWidget {
   final Game game;
+  final bool isKnockout;
   final Guess? existingGuess;
   final void Function(Prediction prediction) onPredictionChanged;
 
   const UpcomingGameCard({
     required this.game,
     required this.onPredictionChanged,
+    this.isKnockout = false,
     this.existingGuess,
     super.key,
   });
@@ -36,6 +38,10 @@ class UpcomingGameCard extends StatelessWidget {
             _buildLockBadge(),
             const SizedBox(height: 8),
             _buildMatchInfo(),
+            if (isKnockout) ...[
+              const SizedBox(height: 4),
+              _buildKnockoutNote(),
+            ],
           ],
         ),
       ),
@@ -164,6 +170,22 @@ class UpcomingGameCard extends StatelessWidget {
     return Text(
       '🕐 $location',
       style: const TextStyle(fontSize: 11, color: Colors.black54),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  // ── Knockout note ─────────────────────────────────────────────────────────
+
+  /// Knockout games are decided over 120 minutes; penalties don't affect the
+  /// predicted outcome, so we tell the user the result is judged at 120'.
+  Widget _buildKnockoutNote() {
+    return const Text(
+      'Result after ~120 min (without penalties)',
+      style: TextStyle(
+        fontSize: 10,
+        color: Colors.black45,
+        fontStyle: FontStyle.italic,
+      ),
       textAlign: TextAlign.center,
     );
   }

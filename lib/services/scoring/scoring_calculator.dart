@@ -2,6 +2,22 @@ import '../../models/game.dart';
 import '../../models/guess.dart';
 import '../../models/score_summary.dart';
 
+/// The instant the knockout stage begins — the single source of truth for the
+/// two scoring regimes. Change it here and scoring, the "2 pts" badge, and the
+/// 120-min note all follow.
+///
+/// Games kicking off **before** this use group-stage rules:
+///   +1 per correct guess, +2 for a perfect match day (the "set"), grouped by round.
+/// Games kicking off **at or after** this use knockout rules:
+///   +2 per correct guess, no set bonus, never grouped into match days.
+///
+/// 2026-06-28 19:00 UTC = Sunday 28 June 2026, 22:00 Israel time (IDT, UTC+3).
+final DateTime kKnockoutCutoff = DateTime.utc(2026, 6, 28, 19, 0);
+
+/// True when [game] is scored under knockout rules (kickoff at/after the cutoff).
+bool usesKnockoutRules(Game game) =>
+    !game.kickoffTime.isBefore(kKnockoutCutoff);
+
 /// Calculates a user's score from their guesses against finished game results.
 ///
 /// Call this after a game finishes — pass only finished games with a known outcome.
@@ -18,19 +34,35 @@ ScoreSummary calculate({
     for (final g in userGuesses.where((g) => g.userId == userId)) g.gameId: g
   };
 
-  int correctGuesses = 0;
+  // Split finished games by scoring regime. The cutoff is the only switch.
+  final List<Game> groupStageGames =
+      finishedGames.where((g) => !usesKnockoutRules(g)).toList();
+  final List<Game> knockoutGames =
+      finishedGames.where(usesKnockoutRules).toList();
 
-  for (final game in finishedGames) {
+  // Group stage: +1 per correct guess.
+  int correctGuesses = 0;
+  for (final game in groupStageGames) {
     final guess = guessMap[game.id];
     if (guess != null && guess.prediction == game.outcome) {
       correctGuesses++;
     }
   }
 
-  // Group finished games by their match day (round field).
-  // A set is all games belonging to the same match day.
+  // Knockout: +2 per correct guess. Counted separately so totalPoints can
+  // double them. No match-day grouping, no set bonus.
+  int knockoutCorrectGuesses = 0;
+  for (final game in knockoutGames) {
+    final guess = guessMap[game.id];
+    if (guess != null && guess.prediction == game.outcome) {
+      knockoutCorrectGuesses++;
+    }
+  }
+
+  // Set bonus applies to group-stage games only — knockout games never form a
+  // set. Group those games by their match day (round field).
   final Map<String, List<Game>> gamesByRound = {};
-  for (final game in finishedGames) {
+  for (final game in groupStageGames) {
     gamesByRound.putIfAbsent(game.round, () => []).add(game);
   }
 
@@ -44,6 +76,7 @@ ScoreSummary calculate({
   return ScoreSummary(
     userId: userId,
     correctGuesses: correctGuesses,
+    knockoutCorrectGuesses: knockoutCorrectGuesses,
     setBonusCount: setBonusCount,
   );
 }

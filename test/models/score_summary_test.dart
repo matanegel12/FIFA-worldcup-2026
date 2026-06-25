@@ -31,6 +31,26 @@ void main() {
       expect(summary.totalPoints, 6); // 4 + (1 × 2)
     });
 
+    test('knockout correct guesses are worth 2 each', () {
+      const summary = ScoreSummary(
+        userId: 'uid-1',
+        correctGuesses: 0,
+        knockoutCorrectGuesses: 3,
+        setBonusCount: 0,
+      );
+      expect(summary.totalPoints, 6); // 3 × 2
+    });
+
+    test('group, knockout and set bonus points all add up', () {
+      const summary = ScoreSummary(
+        userId: 'uid-1',
+        correctGuesses: 2, // +2
+        knockoutCorrectGuesses: 2, // +4
+        setBonusCount: 1, // +2
+      );
+      expect(summary.totalPoints, 8);
+    });
+
     test('zero everything gives zero points', () {
       const summary = ScoreSummary(
         userId: 'uid-1',
@@ -71,6 +91,20 @@ void main() {
     test('different setBonusCount are not equal', () {
       const a = ScoreSummary(userId: 'uid-1', correctGuesses: 3, setBonusCount: 1);
       const b = ScoreSummary(userId: 'uid-1', correctGuesses: 3, setBonusCount: 0);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('different knockoutCorrectGuesses are not equal', () {
+      const a = ScoreSummary(
+          userId: 'uid-1',
+          correctGuesses: 3,
+          knockoutCorrectGuesses: 1,
+          setBonusCount: 1);
+      const b = ScoreSummary(
+          userId: 'uid-1',
+          correctGuesses: 3,
+          knockoutCorrectGuesses: 2,
+          setBonusCount: 1);
       expect(a, isNot(equals(b)));
     });
   });
