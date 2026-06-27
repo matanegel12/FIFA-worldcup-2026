@@ -46,8 +46,14 @@ void main() {
       }
     });
 
-    test('holds all six Round of 32 fixtures', () {
-      expect(kHardcodedGames.length, 6);
+    test('holds the five feed-missing Round of 32 fixtures', () {
+      expect(kHardcodedGames.length, 5);
+    });
+
+    test('does not hardcode Netherlands vs Morocco (the feed provides it)', () {
+      final bool hasNedMar = kHardcodedGames.any((g) =>
+          g.homeTeam.fifaCode == 'NED' && g.awayTeam.fifaCode == 'MAR');
+      expect(hasNedMar, isFalse);
     });
 
     test('France vs Sweden 00:00 IL is stored as the previous day in UTC', () {

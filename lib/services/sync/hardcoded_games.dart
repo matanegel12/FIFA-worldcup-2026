@@ -53,16 +53,10 @@ final List<Game> kHardcodedGames = [
     status: GameStatus.upcoming,
   ),
 
-  // Netherlands vs Morocco · Tue 30 Jun 2026, 04:00 IL (01:00 UTC) · Monterrey (Guadalupe)
-  Game(
-    id: '2026-06-30_NED_MAR',
-    homeTeam: const Team(fifaCode: 'NED', isoCode: 'nl', name: 'Netherlands'),
-    awayTeam: const Team(fifaCode: 'MAR', isoCode: 'ma', name: 'Morocco'),
-    kickoffTime: DateTime.utc(2026, 6, 30, 1, 0),
-    round: 'Round of 32',
-    ground: 'Monterrey (Guadalupe)',
-    status: GameStatus.upcoming,
-  ),
+  // NOTE: Netherlands vs Morocco is intentionally NOT hardcoded — the openfootball
+  // feed already provides it (local date 2026-06-29, id 2026-06-29_NED_MAR). A
+  // hardcoded copy keyed on the UTC date (2026-06-30) created a duplicate card.
+  // Only fixtures the feed still lists with placeholder teams belong here.
 
   // Ivory Coast vs Norway · Tue 30 Jun 2026, 20:00 IL (17:00 UTC) · Arlington
   Game(

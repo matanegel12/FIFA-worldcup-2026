@@ -108,6 +108,11 @@ class _UpcomingGamesPageState
       items.add(_buildGroupHeader(group.round, group.date, group.isKnockout));
 
       for (final Game game in group.games) {
+        // Knockout games span several days, so each one shows its own date
+        // above the card. The group header stays a single "Round of 32".
+        if (group.isKnockout) {
+          items.add(_buildDateLabel(game.kickoffTime));
+        }
         items.add(UpcomingGameCard(
           game: game,
           isKnockout: group.isKnockout,
@@ -128,13 +133,17 @@ class _UpcomingGamesPageState
   }
 
   Widget _buildGroupHeader(String round, DateTime firstKickoff, bool isKnockout) {
+    // Knockout rounds span multiple days, so the header is just the round name
+    // ("Round of 32") + the "2 pts" badge; each game shows its own date below.
+    // Group-stage matchdays are single-day, so they keep the date in the header.
+    final String title = isKnockout ? round : '$round · ${_formatDate(firstKickoff)}';
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              '$round · ${_formatDate(firstKickoff)}',
+              title,
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -145,6 +154,23 @@ class _UpcomingGamesPageState
           ),
           if (isKnockout) _buildPointsBadge(),
         ],
+      ),
+    );
+  }
+
+  /// Date label shown above each knockout game card, e.g. "Mon Jun 29".
+  /// Uses IL time so a 00:00 IL kickoff shows the IL day, not the UTC day.
+  Widget _buildDateLabel(DateTime kickoffUtc) {
+    final DateTime kickoffIL = kickoffUtc.toUtc().add(const Duration(hours: 3));
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 4),
+      child: Text(
+        _formatDateWithWeekday(kickoffIL),
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.primary,
+        ),
       ),
     );
   }
@@ -175,5 +201,13 @@ class _UpcomingGamesPageState
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return '${months[dt.month - 1]} ${dt.day}';
+  }
+
+  /// "Mon Jun 29" — weekday + month + day, for the per-game date label.
+  String _formatDateWithWeekday(DateTime dt) {
+    const List<String> days = [
+      'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+    ];
+    return '${days[dt.weekday - 1]} ${_formatDate(dt)}';
   }
 }
