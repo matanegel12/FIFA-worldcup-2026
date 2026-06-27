@@ -39,5 +39,24 @@ void main() {
       expect(g.ground, 'Los Angeles');
       expect(g.kickoffTime, DateTime.utc(2026, 6, 28, 19, 0));
     });
+
+    test('every fixture is labelled "Round of 32"', () {
+      for (final Game g in kHardcodedGames) {
+        expect(g.round, 'Round of 32');
+      }
+    });
+
+    test('holds all six Round of 32 fixtures', () {
+      expect(kHardcodedGames.length, 6);
+    });
+
+    test('France vs Sweden 00:00 IL is stored as the previous day in UTC', () {
+      // Wed 1 Jul 00:00 IL (UTC+3) = Tue 30 Jun 21:00 UTC — crosses midnight.
+      final Game g =
+          kHardcodedGames.firstWhere((g) => g.id == '2026-06-30_FRA_SWE');
+      expect(g.homeTeam.name, 'France');
+      expect(g.awayTeam.name, 'Sweden');
+      expect(g.kickoffTime, DateTime.utc(2026, 6, 30, 21, 0));
+    });
   });
 }

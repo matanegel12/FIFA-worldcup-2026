@@ -163,15 +163,31 @@ class UpcomingGameCard extends StatelessWidget {
     final DateTime kickoffIL = kickoffUtc.add(const Duration(hours: 3));
     final String hour = kickoffIL.hour.toString().padLeft(2, '0');
     final String minute = kickoffIL.minute.toString().padLeft(2, '0');
-    final String location = game.ground.isNotEmpty
-        ? '$hour:$minute IL · ${game.ground}'
-        : '$hour:$minute IL';
+    // Date is taken from the IL time so a game like 00:00 IL shows the IL day,
+    // not the (previous) UTC day — important when a kickoff crosses midnight.
+    final String date = _formatDate(kickoffIL);
+    final String time = '$hour:$minute IL';
+    final String info = game.ground.isNotEmpty
+        ? '$date · $time · ${game.ground}'
+        : '$date · $time';
 
     return Text(
-      '🕐 $location',
+      '🕐 $info',
       style: const TextStyle(fontSize: 11, color: Colors.black54),
       textAlign: TextAlign.center,
     );
+  }
+
+  /// "Mon Jun 29" — weekday + month + day, for the match info line.
+  String _formatDate(DateTime dt) {
+    const List<String> days = [
+      'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+    ];
+    const List<String> months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${days[dt.weekday - 1]} ${months[dt.month - 1]} ${dt.day}';
   }
 
   // ── Knockout note ─────────────────────────────────────────────────────────

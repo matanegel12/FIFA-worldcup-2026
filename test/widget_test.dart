@@ -54,6 +54,7 @@ void main() {
     expect(find.text('Mexico'), findsWidgets);
     expect(find.text('Brazil'), findsWidgets);
     expect(find.textContaining('IL'), findsOneWidget); // card shows kickoff in IL time
+    expect(find.textContaining('Jun'), findsOneWidget); // card shows the kickoff date
     expect(find.textContaining('Mexico City'), findsOneWidget);
   });
 
