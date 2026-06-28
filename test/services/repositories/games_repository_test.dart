@@ -61,12 +61,12 @@ void main() {
       status: GameStatus.upcoming,
     );
 
-    // Dated after the current clock so it stays "upcoming" as time advances.
+    // Far-future date so it stays "upcoming" regardless of the wall clock.
     final futureGame = Game(
       id: 'future',
       homeTeam: mexico,
       awayTeam: brazil,
-      kickoffTime: DateTime.utc(2026, 6, 27, 15, 0),
+      kickoffTime: DateTime.utc(2099, 6, 27, 15, 0),
       status: GameStatus.upcoming,
     );
 

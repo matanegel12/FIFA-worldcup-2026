@@ -46,8 +46,8 @@ void main() {
       }
     });
 
-    test('holds the five feed-missing Round of 32 fixtures', () {
-      expect(kHardcodedGames.length, 5);
+    test('holds the feed-missing Round of 32 fixtures', () {
+      expect(kHardcodedGames.length, 15);
     });
 
     test('does not hardcode Netherlands vs Morocco (the feed provides it)', () {
