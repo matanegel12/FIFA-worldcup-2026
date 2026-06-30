@@ -42,6 +42,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # In-memory fake of Cloud Firestore for testing VM/repository writes
+  # (e.g. the atomic rescore batch) without touching a real backend.
+  fake_cloud_firestore: ^3.0.0
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

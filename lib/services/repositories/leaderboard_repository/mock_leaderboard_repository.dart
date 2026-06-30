@@ -10,6 +10,12 @@ class MockLeaderboardRepository implements LeaderboardRepository {
       : _store = store ?? MockStore.instance;
 
   @override
+  Stream<List<LeaderboardEntry>> watchRankedEntries() =>
+      // The in-memory store has no change feed, so we emit the current ranking
+      // once. (The Firestore implementation is the one that streams live.)
+      Stream<List<LeaderboardEntry>>.value(_rankedEntries());
+
+  @override
   Future<List<LeaderboardEntry>> fetchTop10() async {
     final List<LeaderboardEntry> entries = _rankedEntries();
     return entries.take(LeaderboardEntry.maxSize).toList();

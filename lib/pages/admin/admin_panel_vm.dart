@@ -12,6 +12,13 @@ import '../../services/repositories/guesses_repository/guesses_repository.dart';
 import '../../services/scoring/scoring_calculator.dart';
 import 'admin_panel_model.dart';
 
+/// One pending write to a user document: the doc reference and the fields to set.
+/// Collected during the read/compute phase, then flushed together in one batch.
+typedef _UserScoreUpdate = ({
+  DocumentReference<Map<String, dynamic>> ref,
+  Map<String, dynamic> data,
+});
+
 class AdminPanelViewModel extends ViewModel<AdminPanelModel> {
   final GamesRepository _gamesRepository;
   final GuessesRepository _guessesRepository;
@@ -164,32 +171,24 @@ class AdminPanelViewModel extends ViewModel<AdminPanelModel> {
     await loadGames();
   }
 
-  /// Resets every user to 0 pts, then rescores from all real (non-test)
-  /// finished games using the production scoring path.
+  /// Recomputes every user's score from scratch, using only real (non-test)
+  /// finished games. Each user is fully recomputed, so there is no separate
+  /// "reset to 0" step — a user with no correct guesses simply computes to 0.
+  /// All writes land in one atomic batch (see [_commitUserUpdates]).
   Future<void> recomputeAllScores() async {
     final QuerySnapshot<Map<String, dynamic>> usersSnap =
         await _firestore.collection('users').get();
 
-    // Step 1 — reset all users to 0.
-    final WriteBatch resetBatch = _firestore.batch();
-    for (final QueryDocumentSnapshot<Map<String, dynamic>> doc
-        in usersSnap.docs) {
-      resetBatch.update(doc.reference, {
-        'totalPoints': 0,
-        'scoreReachedAt': null,
-      });
-    }
-    await resetBatch.commit();
-
-    // Step 2 — fetch only real finished games (exclude test results).
+    // Fetch only real finished games (exclude test results).
     final List<Game> allFinished =
         await _gamesRepository.fetchFinishedGames();
     final List<Game> realFinished =
         allFinished.where((Game g) => !g.isTestResult).toList();
 
-    if (realFinished.isEmpty) return;
+    final DateTime now = DateTime.now().toUtc();
 
-    // Step 3 — rescore each user with the production scoring function.
+    // Phase 1 — compute every user's new score (reads only, no writes yet).
+    final List<_UserScoreUpdate> updates = [];
     for (final QueryDocumentSnapshot<Map<String, dynamic>> doc
         in usersSnap.docs) {
       final User user = User.fromJson(doc.id, doc.data());
@@ -203,13 +202,18 @@ class AdminPanelViewModel extends ViewModel<AdminPanelModel> {
         userGuesses: userGuesses,
       );
 
-      await _firestore.collection('users').doc(user.id).update({
-        'totalPoints': summary.totalPoints,
-        'scoreReachedAt': summary.totalPoints > 0
-            ? DateTime.now().toUtc().toIso8601String()
-            : null,
-      });
+      updates.add((
+        ref: doc.reference,
+        data: {
+          'totalPoints': summary.totalPoints,
+          'scoreReachedAt':
+              summary.totalPoints > 0 ? now.toIso8601String() : null,
+        },
+      ));
     }
+
+    // Phase 2 — flush all updates in one atomic commit.
+    await _commitUserUpdates(updates);
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────
@@ -221,6 +225,11 @@ class AdminPanelViewModel extends ViewModel<AdminPanelModel> {
     final QuerySnapshot<Map<String, dynamic>> usersSnap =
         await _firestore.collection('users').get();
 
+    final DateTime now = DateTime.now().toUtc();
+
+    // Phase 1 — read each user's guesses and compute their new total. No writes
+    // happen here, so the leaderboard still reflects a fully consistent old state.
+    final List<_UserScoreUpdate> updates = [];
     for (final QueryDocumentSnapshot<Map<String, dynamic>> doc
         in usersSnap.docs) {
       final User user = User.fromJson(doc.id, doc.data());
@@ -234,12 +243,36 @@ class AdminPanelViewModel extends ViewModel<AdminPanelModel> {
         userGuesses: userGuesses,
       );
 
-      await _firestore.collection('users').doc(user.id).update({
-        'totalPoints': summary.totalPoints,
-        'scoreReachedAt': summary.totalPoints > user.totalPoints
-            ? DateTime.now().toUtc().toIso8601String()
-            : user.scoreReachedAt?.toIso8601String(),
-      });
+      updates.add((
+        ref: doc.reference,
+        data: {
+          'totalPoints': summary.totalPoints,
+          // Advance scoreReachedAt only when the score actually went up — this
+          // is the tiebreaker (earliest to reach a score ranks higher).
+          'scoreReachedAt': summary.totalPoints > user.totalPoints
+              ? now.toIso8601String()
+              : user.scoreReachedAt?.toIso8601String(),
+        },
+      ));
+    }
+
+    // Phase 2 — commit every user's new total together.
+    await _commitUserUpdates(updates);
+  }
+
+  /// Flushes all collected user-score updates in one atomic [WriteBatch], so a
+  /// client reading the leaderboard sees either all of the old totals or all of
+  /// the new ones — never a half-updated mix. Firestore caps a batch at 500
+  /// writes, so we chunk defensively if the user count ever grows past that
+  /// (each chunk is its own atomic commit; below 500 users it is a single one).
+  Future<void> _commitUserUpdates(List<_UserScoreUpdate> updates) async {
+    const int batchLimit = 500;
+    for (int i = 0; i < updates.length; i += batchLimit) {
+      final WriteBatch batch = _firestore.batch();
+      for (final _UserScoreUpdate update in updates.skip(i).take(batchLimit)) {
+        batch.update(update.ref, update.data);
+      }
+      await batch.commit();
     }
   }
 }
