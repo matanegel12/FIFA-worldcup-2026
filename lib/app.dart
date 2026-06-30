@@ -4,6 +4,8 @@ import 'package:mvvm_remepy/base_page.dart';
 import 'app_theme.dart';
 import 'pages/admin/admin_panel_page.dart';
 import 'pages/admin/admin_panel_vm.dart';
+import 'pages/admin/shaming_table/shaming_table_page.dart';
+import 'pages/admin/shaming_table/shaming_table_vm.dart';
 import 'pages/auth/auth_gate/auth_gate_page.dart';
 import 'pages/auth/auth_gate/auth_gate_vm.dart';
 import 'pages/auth/sign_in/sign_in_page.dart';
@@ -68,6 +70,9 @@ class App extends StatelessWidget {
             ),
         '/admin': (_) => AdminPanelPage(
               viewModel: AdminPanelViewModel(),
+            ),
+        '/admin/shaming': (_) => ShamingTablePage(
+              viewModel: ShamingTableViewModel(),
             ),
       },
     );

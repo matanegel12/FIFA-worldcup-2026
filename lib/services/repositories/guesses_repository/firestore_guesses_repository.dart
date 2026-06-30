@@ -33,5 +33,12 @@ class FirestoreGuessesRepository implements GuessesRepository {
 
   @override
   Future<void> saveGuess(Guess guess) =>
-      _col.doc(Guess.compoundId(guess.userId, guess.gameId)).set(guess.toJson());
+      _col.doc(Guess.compoundId(guess.userId, guess.gameId)).set({
+        ...guess.toJson(),
+        // Server-set time of this write (Google's clock, not the device's).
+        // Re-stamped on every save, including late edits — that is exactly the
+        // signal the admin "wall of shame" reads. We never block the write:
+        // the guess-locking loophole stays open by design.
+        'submittedAt': FieldValue.serverTimestamp(),
+      });
 }

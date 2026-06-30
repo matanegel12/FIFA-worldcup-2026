@@ -25,6 +25,19 @@ class _AdminPanelPageState
   Color get backgroundColor => Theme.of(context).colorScheme.surface;
 
   @override
+  PreferredSizeWidget? get appBar => AppBar(
+        title: Text(model.appBarTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.sentiment_very_dissatisfied),
+            tooltip: 'Wall of Shame',
+            onPressed: () =>
+                Navigator.of(context).pushNamed('/admin/shaming'),
+          ),
+        ],
+      );
+
+  @override
   void onNotify([AdminPanelModel? data]) {
     super.onNotify(data);
     final String? message = model.successMessage;
