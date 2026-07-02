@@ -6,9 +6,12 @@ class ScoreSummary {
   /// Correct group-stage guesses (kickoff before the knockout cutoff) — +1 each.
   final int correctGuesses;
 
-  /// Correct knockout-stage guesses (kickoff at/after the knockout cutoff) — +2 each.
+  /// Points already earned from correct knockout-stage guesses (kickoff at/after
+  /// the knockout cutoff). Pre-weighted by round — Round of 32 is +2 per correct
+  /// guess, Round of 16 is +3, and so on (see ScoringCalculator.pointsForKnockoutRound)
+  /// — because the per-guess value varies by round, unlike the flat +1 group stage.
   /// Defaults to 0 so callers that only deal with the group stage are unaffected.
-  final int knockoutCorrectGuesses;
+  final int knockoutPoints;
 
   /// Completed group-stage sets (perfect match day) — +2 each.
   /// Knockout games never form a set, so they never contribute here.
@@ -17,14 +20,13 @@ class ScoreSummary {
   const ScoreSummary({
     required this.userId,
     required this.correctGuesses,
-    this.knockoutCorrectGuesses = 0,
+    this.knockoutPoints = 0,
     required this.setBonusCount,
   });
 
   /// Group stage: +1 per correct guess, +2 per completed set (perfect match day).
-  /// Knockout stage: +2 per correct guess, no set bonus.
-  int get totalPoints =>
-      correctGuesses + (knockoutCorrectGuesses * 2) + (setBonusCount * 2);
+  /// Knockout stage: [knockoutPoints] is already weighted by round, no set bonus.
+  int get totalPoints => correctGuesses + knockoutPoints + (setBonusCount * 2);
 
   @override
   bool operator ==(Object other) =>
@@ -32,14 +34,14 @@ class ScoreSummary {
       (other is ScoreSummary &&
           other.userId == userId &&
           other.correctGuesses == correctGuesses &&
-          other.knockoutCorrectGuesses == knockoutCorrectGuesses &&
+          other.knockoutPoints == knockoutPoints &&
           other.setBonusCount == setBonusCount);
 
   @override
   int get hashCode =>
-      Object.hash(userId, correctGuesses, knockoutCorrectGuesses, setBonusCount);
+      Object.hash(userId, correctGuesses, knockoutPoints, setBonusCount);
 
   @override
   String toString() =>
-      'ScoreSummary($userId, correct: $correctGuesses, knockoutCorrect: $knockoutCorrectGuesses, setBonuses: $setBonusCount, total: $totalPoints)';
+      'ScoreSummary($userId, correct: $correctGuesses, knockoutPoints: $knockoutPoints, setBonuses: $setBonusCount, total: $totalPoints)';
 }

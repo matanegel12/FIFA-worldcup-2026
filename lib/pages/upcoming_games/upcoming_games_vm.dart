@@ -134,6 +134,7 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
     for (int i = 0; i < rounds.length; i++) {
       final String round = rounds[i];
       final List<Game> games = byRound[round]!;
+      final bool isKnockout = usesKnockoutRules(games.first);
       result.add(RoundGroup(
         round: round,
         date: DateTime.utc(
@@ -141,7 +142,8 @@ class UpcomingGamesViewModel extends ViewModel<UpcomingGamesModel> {
           games.first.kickoffTime.month,
           games.first.kickoffTime.day,
         ),
-        isKnockout: usesKnockoutRules(games.first),
+        isKnockout: isKnockout,
+        pointsPerGame: isKnockout ? pointsForKnockoutRound(round) : 1,
         games: games,
       ));
     }

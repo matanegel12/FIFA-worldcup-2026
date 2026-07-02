@@ -18,6 +18,27 @@ final DateTime kKnockoutCutoff = DateTime.utc(2026, 6, 28, 19, 0);
 bool usesKnockoutRules(Game game) =>
     !game.kickoffTime.isBefore(kKnockoutCutoff);
 
+/// Points per correct guess for each knockout round — later rounds are worth
+/// more. Round names must match exactly what the openfootball feed / the
+/// hardcoded fixtures use for `Game.round`.
+///
+/// Any knockout round not listed here (e.g. "Match for third place") falls
+/// back to [_defaultKnockoutPoints], the Round of 32 value.
+const Map<String, int> _knockoutPointsByRound = {
+  'Round of 32': 2,
+  'Round of 16': 3,
+  'Quarter-final': 4,
+  'Semi-final': 5,
+  'Final': 6,
+};
+
+const int _defaultKnockoutPoints = 2;
+
+/// Points awarded per correct guess for [round]. Only meaningful for a round
+/// scored under knockout rules — check [usesKnockoutRules] first.
+int pointsForKnockoutRound(String round) =>
+    _knockoutPointsByRound[round] ?? _defaultKnockoutPoints;
+
 /// Calculates a user's score from their guesses against finished game results.
 ///
 /// Call this after a game finishes — pass only finished games with a known outcome.
@@ -49,13 +70,14 @@ ScoreSummary calculate({
     }
   }
 
-  // Knockout: +2 per correct guess. Counted separately so totalPoints can
-  // double them. No match-day grouping, no set bonus.
-  int knockoutCorrectGuesses = 0;
+  // Knockout: each correct guess is worth its round's point value (see
+  // pointsForKnockoutRound) — already weighted here since the weight varies
+  // per round. No match-day grouping, no set bonus.
+  int knockoutPoints = 0;
   for (final game in knockoutGames) {
     final guess = guessMap[game.id];
     if (guess != null && guess.prediction == game.outcome) {
-      knockoutCorrectGuesses++;
+      knockoutPoints += pointsForKnockoutRound(game.round);
     }
   }
 
@@ -76,7 +98,7 @@ ScoreSummary calculate({
   return ScoreSummary(
     userId: userId,
     correctGuesses: correctGuesses,
-    knockoutCorrectGuesses: knockoutCorrectGuesses,
+    knockoutPoints: knockoutPoints,
     setBonusCount: setBonusCount,
   );
 }

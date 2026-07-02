@@ -105,7 +105,8 @@ class _UpcomingGamesPageState
     final List<Widget> items = [];
 
     for (final RoundGroup group in model.groupedGames) {
-      items.add(_buildGroupHeader(group.round, group.date, group.isKnockout));
+      items.add(_buildGroupHeader(
+          group.round, group.date, group.isKnockout, group.pointsPerGame));
 
       for (final Game game in group.games) {
         // Knockout games span several days, so each one shows its own date
@@ -132,9 +133,10 @@ class _UpcomingGamesPageState
     );
   }
 
-  Widget _buildGroupHeader(String round, DateTime firstKickoff, bool isKnockout) {
+  Widget _buildGroupHeader(
+      String round, DateTime firstKickoff, bool isKnockout, int pointsPerGame) {
     // Knockout rounds span multiple days, so the header is just the round name
-    // ("Round of 32") + the "2 pts" badge; each game shows its own date below.
+    // ("Round of 32") + the points badge; each game shows its own date below.
     // Group-stage matchdays are single-day, so they keep the date in the header.
     final String title = isKnockout ? round : '$round · ${_formatDate(firstKickoff)}';
     return Padding(
@@ -152,7 +154,7 @@ class _UpcomingGamesPageState
               ),
             ),
           ),
-          if (isKnockout) _buildPointsBadge(),
+          if (isKnockout) _buildPointsBadge(pointsPerGame),
         ],
       ),
     );
@@ -175,18 +177,18 @@ class _UpcomingGamesPageState
     );
   }
 
-  /// "2 pts" badge shown at the end of a knockout round header — these games
-  /// are worth 2 points each (no match-day set bonus).
-  Widget _buildPointsBadge() {
+  /// Points badge shown at the end of a knockout round header — e.g. "3 pts"
+  /// for Round of 16 (no match-day set bonus in the knockout stage).
+  Widget _buildPointsBadge(int pointsPerGame) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: AppTheme.secondary,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Text(
-        '2 pts',
-        style: TextStyle(
+      child: Text(
+        '$pointsPerGame pts',
+        style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.bold,
           color: Colors.black,

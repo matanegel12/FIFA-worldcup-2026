@@ -290,26 +290,55 @@ void main() {
   });
 
   group('knockout scoring', () {
-    test('+2 for a correct knockout prediction', () {
+    test('+2 for a correct Round of 32 prediction', () {
       final game = _knockoutGame(id: 'k1', homeScore: 2, awayScore: 1); // teamAWins
       final summary = _calc([game], [_guess('k1', Prediction.teamAWins)]);
 
-      expect(summary.knockoutCorrectGuesses, 1);
+      expect(summary.knockoutPoints, 2);
       expect(summary.correctGuesses, 0); // not counted as group-stage
       expect(summary.setBonusCount, 0);
       expect(summary.totalPoints, 2);
+    });
+
+    test('+3 for a correct Round of 16 prediction', () {
+      final game = _knockoutGame(
+          id: 'k1', homeScore: 2, awayScore: 1, round: 'Round of 16'); // teamAWins
+      final summary = _calc([game], [_guess('k1', Prediction.teamAWins)]);
+
+      expect(summary.knockoutPoints, 3);
+      expect(summary.totalPoints, 3);
+    });
+
+    test('later knockout rounds are worth progressively more', () {
+      final quarterFinal = _knockoutGame(
+          id: 'k1', homeScore: 1, awayScore: 0, round: 'Quarter-final');
+      final semiFinal = _knockoutGame(
+          id: 'k2', homeScore: 1, awayScore: 0, round: 'Semi-final');
+      final finalGame =
+          _knockoutGame(id: 'k3', homeScore: 1, awayScore: 0, round: 'Final');
+      final summary = _calc(
+        [quarterFinal, semiFinal, finalGame],
+        [
+          _guess('k1', Prediction.teamAWins),
+          _guess('k2', Prediction.teamAWins),
+          _guess('k3', Prediction.teamAWins),
+        ],
+      );
+
+      expect(summary.knockoutPoints, 15); // 4 + 5 + 6
+      expect(summary.totalPoints, 15);
     });
 
     test('+0 for a wrong knockout prediction', () {
       final game = _knockoutGame(id: 'k1', homeScore: 2, awayScore: 1); // teamAWins
       final summary = _calc([game], [_guess('k1', Prediction.teamBWins)]);
 
-      expect(summary.knockoutCorrectGuesses, 0);
+      expect(summary.knockoutPoints, 0);
       expect(summary.totalPoints, 0);
     });
 
     test('knockout games never earn a set bonus, even a perfect round', () {
-      // Two correct knockout games in the same round — no bonus, just 2+2.
+      // Two correct Round of 32 games in the same round — no bonus, just 2+2.
       final k1 = _knockoutGame(id: 'k1', homeScore: 1, awayScore: 0);
       final k2 = _knockoutGame(id: 'k2', homeScore: 0, awayScore: 2);
       final summary = _calc([k1, k2], [
@@ -317,7 +346,7 @@ void main() {
         _guess('k2', Prediction.teamBWins),
       ]);
 
-      expect(summary.knockoutCorrectGuesses, 2);
+      expect(summary.knockoutPoints, 4);
       expect(summary.setBonusCount, 0);
       expect(summary.totalPoints, 4); // 2 × 2, no bonus
     });
@@ -328,7 +357,7 @@ void main() {
       final summary = _calc([game], [_guess('g1', Prediction.teamAWins)]);
 
       expect(summary.correctGuesses, 1);
-      expect(summary.knockoutCorrectGuesses, 0);
+      expect(summary.knockoutPoints, 0);
       expect(summary.setBonusCount, 1); // single perfect group-stage round
       expect(summary.totalPoints, 3); // 1 + 2 bonus
     });
@@ -336,7 +365,7 @@ void main() {
     test('mixed group-stage and knockout games score under their own rules', () {
       // Group stage: a perfect round worth 1 + 2 = 3.
       final gs = _finishedGame(id: 'g1', homeScore: 1, awayScore: 0);
-      // Knockout: one correct worth 2.
+      // Knockout: one correct Round of 32 guess worth 2.
       final ko = _knockoutGame(id: 'k1', homeScore: 0, awayScore: 1);
       final summary = _calc([gs, ko], [
         _guess('g1', Prediction.teamAWins),
@@ -344,9 +373,17 @@ void main() {
       ]);
 
       expect(summary.correctGuesses, 1);
-      expect(summary.knockoutCorrectGuesses, 1);
+      expect(summary.knockoutPoints, 2);
       expect(summary.setBonusCount, 1);
       expect(summary.totalPoints, 5); // (1 + 2 bonus) + 2
+    });
+
+    test('an unmapped knockout round falls back to the Round of 32 value', () {
+      final game = _knockoutGame(
+          id: 'k1', homeScore: 1, awayScore: 0, round: 'Match for third place');
+      final summary = _calc([game], [_guess('k1', Prediction.teamAWins)]);
+
+      expect(summary.knockoutPoints, 2);
     });
   });
 

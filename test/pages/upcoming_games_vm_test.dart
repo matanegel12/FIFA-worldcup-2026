@@ -146,11 +146,11 @@ void main() {
   });
 
   group('loadGames — groups sorted and isUnlocked by position', () {
-    test('groups are ordered with lowest round number first', () async {
+    test('groups are ordered by earliest kickoff time, not round number', () async {
       MockStore.instance.seedGames([
-        _futureGame('g3', 'Matchday 14'),
-        _futureGame('g1', 'Matchday 1'),
-        _futureGame('g2', 'Matchday 8'),
+        _futureGame('g3', 'Matchday 14', hour: 14),
+        _futureGame('g1', 'Matchday 1', hour: 1),
+        _futureGame('g2', 'Matchday 8', hour: 8),
       ]);
 
       await vm.loadGames();
@@ -168,6 +168,18 @@ void main() {
       MockStore.instance.seedGames([_futureGame('k1', 'Round of 32')]);
       await vm.loadGames();
       expect(vm.model.groupedGames.first.isKnockout, isTrue);
+    });
+
+    test('Round of 32 is worth 2 points per game', () async {
+      MockStore.instance.seedGames([_futureGame('k1', 'Round of 32')]);
+      await vm.loadGames();
+      expect(vm.model.groupedGames.first.pointsPerGame, 2);
+    });
+
+    test('Round of 16 is worth 3 points per game, more than Round of 32', () async {
+      MockStore.instance.seedGames([_futureGame('k1', 'Round of 16')]);
+      await vm.loadGames();
+      expect(vm.model.groupedGames.first.pointsPerGame, 3);
     });
   });
 
