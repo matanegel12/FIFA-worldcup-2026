@@ -202,16 +202,8 @@ void main() {
   });
 
   group('sorting', () {
-    test('predictions sorted by kickoffTime ascending', () async {
+    test('predictions sorted by kickoffTime descending (latest first)', () async {
       MockStore.instance.seedGames([
-        Game(
-          id: 'g2',
-          homeTeam: _mexico,
-          awayTeam: _brazil,
-          kickoffTime: DateTime.utc(2099, 6, 18, 19, 0),
-          status: GameStatus.upcoming,
-          round: 'Matchday 1',
-        ),
         Game(
           id: 'g1',
           homeTeam: _brazil,
@@ -220,12 +212,20 @@ void main() {
           status: GameStatus.upcoming,
           round: 'Matchday 1',
         ),
+        Game(
+          id: 'g2',
+          homeTeam: _mexico,
+          awayTeam: _brazil,
+          kickoffTime: DateTime.utc(2099, 6, 18, 19, 0),
+          status: GameStatus.upcoming,
+          round: 'Matchday 1',
+        ),
       ]);
 
       await vm.loadPredictions();
 
-      expect(vm.model.predictions[0].game.id, 'g1');
-      expect(vm.model.predictions[1].game.id, 'g2');
+      expect(vm.model.predictions[0].game.id, 'g2');
+      expect(vm.model.predictions[1].game.id, 'g1');
     });
   });
 

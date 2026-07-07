@@ -52,9 +52,10 @@ class PredictionsViewModel extends ViewModel<PredictionsModel> {
         summaries.add(PredictionSummary(game: game, guess: guess, result: result));
       }
 
+      // Latest kickoff first, so the newest games are at the top of the list.
       summaries.sort(
         (PredictionSummary a, PredictionSummary b) =>
-            a.game.kickoffTime.compareTo(b.game.kickoffTime),
+            b.game.kickoffTime.compareTo(a.game.kickoffTime),
       );
 
       model.predictions = summaries;
