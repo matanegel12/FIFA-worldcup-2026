@@ -22,14 +22,15 @@ bool usesKnockoutRules(Game game) =>
 /// more. Round names must match exactly what the openfootball feed / the
 /// hardcoded fixtures use for `Game.round`.
 ///
-/// Any knockout round not listed here (e.g. "Match for third place") falls
-/// back to [_defaultKnockoutPoints], the Round of 32 value.
+/// Any knockout round not listed here falls back to
+/// [_defaultKnockoutPoints], the Round of 32 value.
 const Map<String, int> _knockoutPointsByRound = {
   'Round of 32': 2,
   'Round of 16': 3,
   'Quarter-final': 4,
   'Semi-final': 5,
-  'Final': 6,
+  'Match for third place': 6,
+  'Final': 7,
 };
 
 const int _defaultKnockoutPoints = 2;

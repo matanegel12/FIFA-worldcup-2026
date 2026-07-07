@@ -325,8 +325,17 @@ void main() {
         ],
       );
 
-      expect(summary.knockoutPoints, 15); // 4 + 5 + 6
-      expect(summary.totalPoints, 15);
+      expect(summary.knockoutPoints, 16); // 4 + 5 + 7
+      expect(summary.totalPoints, 16);
+    });
+
+    test('third place match is worth 6 points', () {
+      final game = _knockoutGame(
+          id: 'k1', homeScore: 1, awayScore: 0, round: 'Match for third place');
+      final summary = _calc([game], [_guess('k1', Prediction.teamAWins)]);
+
+      expect(summary.knockoutPoints, 6);
+      expect(summary.totalPoints, 6);
     });
 
     test('+0 for a wrong knockout prediction', () {
@@ -380,7 +389,7 @@ void main() {
 
     test('an unmapped knockout round falls back to the Round of 32 value', () {
       final game = _knockoutGame(
-          id: 'k1', homeScore: 1, awayScore: 0, round: 'Match for third place');
+          id: 'k1', homeScore: 1, awayScore: 0, round: 'Some future round');
       final summary = _calc([game], [_guess('k1', Prediction.teamAWins)]);
 
       expect(summary.knockoutPoints, 2);
