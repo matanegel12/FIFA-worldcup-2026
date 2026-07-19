@@ -54,15 +54,13 @@ class _LeaderboardPageState
     // Local-only hardcoded row for checking the "Last place" label — not
     // real data, never written to Firestore. Remove before shipping.
     final List<LeaderboardEntry> displayEntries = [
-      // rank: 0 (not 1) so it doesn't pick up the 🥇 gold-medal styling that
-      // real rank-1 rows get in LeaderboardRow._buildRankIndicator/_cardColor.
-      const LeaderboardEntry(
-        rank: 0,
+      ...model.topEntries,
+      LeaderboardEntry(
+        rank: model.topEntries.length + 1,
         userId: hardcodedAdelRowId,
         displayName: 'Adel',
         totalPoints: 0,
       ),
-      ...model.topEntries,
     ];
 
     return RefreshIndicator(
