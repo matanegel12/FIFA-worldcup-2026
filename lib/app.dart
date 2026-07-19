@@ -4,6 +4,7 @@ import 'package:mvvm_remepy/base_page.dart';
 import 'app_theme.dart';
 import 'pages/admin/admin_panel_page.dart';
 import 'pages/admin/admin_panel_vm.dart';
+import 'pages/admin/admin_route_guard.dart';
 import 'pages/admin/shaming_table/shaming_table_page.dart';
 import 'pages/admin/shaming_table/shaming_table_vm.dart';
 import 'pages/auth/auth_gate/auth_gate_page.dart';
@@ -68,11 +69,15 @@ class App extends StatelessWidget {
                 gameSyncService: gameSyncService,
               ),
             ),
-        '/admin': (_) => AdminPanelPage(
-              viewModel: AdminPanelViewModel(),
+        '/admin': (_) => AdminRouteGuard(
+              child: AdminPanelPage(
+                viewModel: AdminPanelViewModel(),
+              ),
             ),
-        '/admin/shaming': (_) => ShamingTablePage(
-              viewModel: ShamingTableViewModel(),
+        '/admin/shaming': (_) => AdminRouteGuard(
+              child: ShamingTablePage(
+                viewModel: ShamingTableViewModel(),
+              ),
             ),
       },
     );
