@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../app_theme.dart';
 import '../../../models/leaderboard_entry.dart';
 
+/// Sentinel userId for the local-only hardcoded "Adel — Last place" row.
+/// Not a real user; added for local checking only, see leaderboard_page.dart.
+const String hardcodedAdelRowId = 'hardcoded_adel_last_place';
+
 class LeaderboardRow extends StatelessWidget {
   final LeaderboardEntry entry;
   final bool isCurrentUser;
@@ -13,8 +17,13 @@ class LeaderboardRow extends StatelessWidget {
     super.key,
   });
 
+  bool get _isHardcodedAdelRow => entry.userId == hardcodedAdelRowId;
+
   @override
   Widget build(BuildContext context) {
+    final Color textColor =
+        _isHardcodedAdelRow ? Colors.white : AppTheme.textPrimary;
+
     return Card(
       color: _cardColor(),
       child: Padding(
@@ -26,20 +35,20 @@ class LeaderboardRow extends StatelessWidget {
             Expanded(
               child: Text(
                 entry.displayName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: textColor,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Text(
-              '${entry.totalPoints} pts',
-              style: const TextStyle(
+              _isHardcodedAdelRow ? 'Last place' : '${entry.totalPoints} pts',
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: textColor,
               ),
             ),
           ],
@@ -49,6 +58,7 @@ class LeaderboardRow extends StatelessWidget {
   }
 
   Color _cardColor() {
+    if (_isHardcodedAdelRow) return Colors.black;
     switch (entry.rank) {
       case 1:
         return AppTheme.rankGold;
@@ -62,6 +72,15 @@ class LeaderboardRow extends StatelessWidget {
   }
 
   Widget _buildRankIndicator() {
+    if (_isHardcodedAdelRow) {
+      return const SizedBox(
+        width: 40,
+        height: 40,
+        child: Center(
+          child: Text('💀', style: TextStyle(fontSize: 24)),
+        ),
+      );
+    }
     switch (entry.rank) {
       case 1:
         return const SizedBox(
