@@ -77,7 +77,7 @@ class LeaderboardRow extends StatelessWidget {
         width: 40,
         height: 40,
         child: Center(
-          child: Text('💀', style: TextStyle(fontSize: 24)),
+          child: Text('🤒', style: TextStyle(fontSize: 24)),
         ),
       );
     }
